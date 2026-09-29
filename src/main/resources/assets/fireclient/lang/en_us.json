@@ -1,0 +1,461 @@
+{
+  "key.category.fireclient": "FireClient",
+  "key.fireclient.module_config": "Open Module Config",
+
+  "fireclient.module.generic.visibility_toggle": "Enables the rendering of this module",
+  "fireclient.module.generic.enabled_toggle": "Enables the logic of this module",
+  "fireclient.module.generic.config_text": "%1$s Configuration",
+  "fireclient.screen.generic.scale_label": "Scale",
+
+  "fireclient.module.generic.back.name": "Back",
+  "fireclient.module.generic.back.tooltip": "Return to Module Select",
+
+  "fireclient.widget.color_picker.name": "Color Picker",
+
+  "fireclient.module.generic.toggle_visible": "Visible",
+  "fireclient.module.generic.toggle_enabled": "Enabled",
+
+  "fireclient.module.angle_display.name": "Angle Display",
+  "fireclient.module.angle_display.description": "Shows your angle",
+
+  "fireclient.module.armor_display.name": "Armor Display",
+  "fireclient.module.armor_display.description": "Shows your armor durability and cooldown",
+  "fireclient.module.armor_display.lock_button.name": "Locked",
+  "fireclient.module.armor_display.lock_button.tooltip": "Locks the position to the hotbar",
+  "fireclient.module.armor_display.mode_toggle.name": "Mode: %1$s",
+  "fireclient.module.armor_display.mode_toggle.tooltip": "Changes the display style",
+  "fireclient.module.armor_display.show_items.name": "Show Items",
+  "fireclient.module.armor_display.show_items.tooltip": "Makes the Text mode show the equipped items",
+
+  "fireclient.module.armor_display.mode.text": "Text",
+  "fireclient.module.armor_display.mode.bars": "Bars",
+
+  "fireclient.module.auto_message.name": "Auto Message",
+  "fireclient.module.auto_message.description": "Automatically inputs your last typed '/msg' or equivalent command so you can quickly remessage somebody when you press the keybind",
+
+  "fireclient.module.big_items.name": "Big Items",
+  "fireclient.module.big_items.description": "Makes certain items render larger",
+
+  "fireclient.module.big_items.toggle_item.tooltip": "Toggle \"%1$s\"",
+
+  "fireclient.module.big_items.add_item.name": "+",
+  "fireclient.module.big_items.add_item.tooltip": "Add item",
+
+  "fireclient.module.big_items.remove_item.name": "-",
+  "fireclient.module.big_items.remove_item.tooltip": "Remove \"%1$s\"",
+
+  "fireclient.module.big_items.add_item.failure.title": "Failed to add item",
+  "fireclient.module.big_items.add_item.invalid_id.contents": "Invalid identifier",
+  "fireclient.module.big_items.add_item.invalid_item.contents": "Item not found",
+  "fireclient.module.big_items.add_item.already_exists.contents": "Item already in list",
+
+  "fireclient.module.block_outline.name": "Block Outline",
+  "fireclient.module.block_outline.description": "Changes the block outline color",
+
+  "fireclient.module.block_outline.thick_outline.name": "Thick Outline",
+  "fireclient.module.block_outline.thick_outline.tooltip": "Makes the block outline thicker",
+
+  "fireclient.module.command_keys.name": "Command Keys",
+  "fireclient.module.command_keys.description": "Runs commands when you press their respective keybind",
+
+  "fireclient.module.command_keys.add_command.name": "Add new command",
+  "fireclient.module.command_keys.add_command.tooltip": "Add a new command to the list",
+  "fireclient.module.command_keys.remove_command.name": "-",
+  "fireclient.module.command_keys.remove_command.tooltip": "Remove \"%1$s\"",
+  "fireclient.module.command_keys.run_command.name": "🛠",
+  "fireclient.module.command_keys.run_command.tooltip": "Run \"%1$s\"",
+
+  "fireclient.module.coordinates.name": "Coordinates",
+  "fireclient.module.coordinates.description": "Shows your in game coordinates, coordinates for the other dimension, and supports a separate window",
+
+  "fireclient.module.coordinates.window_fail.name": "Failed to open window",
+  "fireclient.module.coordinates.window_fail.contents": "Please use a different JRE",
+
+  "fireclient.module.coordinates.other_dimension.name": "Other Dimension",
+  "fireclient.module.coordinates.other_dimension.tooltip": "Shows the other dimension's scaled coordinates (Overworld/Nether)",
+  "fireclient.module.coordinates.windowed_mode.name": "Windowed Mode",
+  "fireclient.module.coordinates.windowed_mode.tooltip": "Shows a separate window for coordinates. Useful for streaming/screenshares",
+
+  "fireclient.module.coords_chat.name": "Coords Chat",
+  "fireclient.module.coords_chat.description": "Sends your coordinates to the selected players when pressing the keybind",
+
+  "fireclient.module.coords_chat.toggle_player.tooltip": "Toggle \"%1$s\"",
+
+  "fireclient.module.coords_chat.add_player.name": "+",
+  "fireclient.module.coords_chat.add_player.tooltip": "Add player",
+
+  "fireclient.module.coords_chat.remove_player.name": "-",
+  "fireclient.module.coords_chat.remove_player.tooltip": "Remove \"%1$s\"",
+
+  "fireclient.module.coords_chat.add_player.failure.title": "Failed to add player",
+  "fireclient.module.coords_chat.add_player.already_exists.contents": "Player already in list",
+
+  "fireclient.module.death_info.name": "Death Info",
+  "fireclient.module.death_info.description": "Shows your death location in the screen and in chat",
+
+  "fireclient.module.entity_count.name": "Entity Count",
+  "fireclient.module.entity_count.description": "Shows the world's entity information",
+
+  "fireclient.module.flight_speed.name": "Flight Speed",
+  "fireclient.module.flight_speed.description": "Allows the control of flight speed",
+  "fireclient.module.flight_speed.display": "Speed: %1$s",
+
+  "fireclient.module.flight_speed.toggle_with_sneak.name": "Toggle with Sneak",
+  "fireclient.module.flight_speed.toggle_with_sneak.tooltip": "Toggle with Sneak",
+
+  "fireclient.module.fps_display.name": "FPS Display",
+  "fireclient.module.fps_display.description": "Shows your framerate",
+
+  "fireclient.module.fullbright.name": "Fullbright",
+  "fireclient.module.fullbright.description": "Makes everything fully lit",
+
+  "fireclient.module.health_display.name": "Health Display",
+  "fireclient.module.health_display.description": "Shows your true health as a decimal",
+
+  "fireclient.module.highest_block.name": "Highest Block",
+  "fireclient.module.highest_block.description": "Shows the world's highest block at your location",
+
+  "fireclient.module.hit_color.name": "Hit Color",
+  "fireclient.module.hit_color.description": "Changes the hit color of entities",
+
+  "fireclient.module.indicators.name": "Indicators",
+  "fireclient.module.indicators.description": "Shows various effect indicators",
+
+  "fireclient.module.indicators.overlay.name": "Overlay",
+  "fireclient.module.indicators.overlay.tooltip": "Shows the on screen overlay for %1$s",
+  "fireclient.module.indicators.indicator.name": "Indicator",
+  "fireclient.module.indicators.indicator.tooltip": "Shows the indicator for %1$s",
+
+  "fireclient.module.indicator_blindness.name": "Blindness",
+  "fireclient.module.indicator_frost.name": "Frost",
+  "fireclient.module.indicator_nausea.name": "Nausea",
+  "fireclient.module.indicator_portal.name": "Portal",
+  "fireclient.module.indicator_in_wall.name": "In Wall",
+  "fireclient.module.indicator_fire.name": "Fire",
+
+  "fireclient.module.kit.name": "Kit",
+  "fireclient.module.kit.description": "Allows you to save, load, edit, and share kits",
+
+  "fireclient.module.kit.name_suggestion": "Kit name",
+  "fireclient.module.kit.create.name": "+",
+  "fireclient.module.kit.create.tooltip": "Create kit",
+  "fireclient.module.kit.create_clipboard.name": "\uD83D\uDCCB",
+  "fireclient.module.kit.create_clipboard.tooltip": "Create kit from Clipboard",
+  "fireclient.module.kit.undo.name": "↶",
+  "fireclient.module.kit.undo.tooltip": "Undo",
+  "fireclient.module.kit.open_folder.name": "\uD83D\uDCC2",
+  "fireclient.module.kit.open_folder.tooltip": "Open kits folder (any kit can be shared and loaded with valid .json files)",
+
+  "fireclient.module.kit.load.tooltip": "Load \"%1$s\"",
+  "fireclient.module.kit.delete.name": "-",
+  "fireclient.module.kit.delete.tooltip": "Delete kit",
+  "fireclient.module.kit.delete.confirm": "Confirm delete \"%1$s\"",
+  "fireclient.module.kit.copy_to_clipboard.name": "\uD83D\uDCCB",
+  "fireclient.module.kit.copy_to_clipboard.tooltip": "Copy \"%1$s\" to the clipboard",
+  "fireclient.module.kit.edit.name": "✎",
+  "fireclient.module.kit.edit.tooltip": "Edit \"%1$s\"",
+  "fireclient.module.kit.share.name": "\uD83C\uDF10",
+  "fireclient.module.kit.share.tooltip": "Share \"%1$s\" in the chat",
+
+  "fireclient.module.kit.load_keybind.name": "\uD83E\uDDF0",
+  "fireclient.module.kit.load_keybind.tooltip": "Load \"%1$s\"",
+
+  "fireclient.module.kit.generic.create.success": "Successfully created \"%1$s\"",
+  "fireclient.module.kit.generic.create_failure.title": "Failed to create \"%1$s\"",
+  "fireclient.module.kit.generic.already_exists.contents": "Kit name already exists",
+  "fireclient.module.kit.generic.invalid_kit.contents": "Invalid kit",
+  "fireclient.module.kit.generic.write_failure.contents": "Failed to write file",
+  "fireclient.module.kit.load.generic.invalid_player.contents": "Invalid player",
+  "fireclient.module.kit.failure.generic_fail": "An error occurred",
+
+  "fireclient.module.kit.empty_name.title": "Please set a kit name",
+  "fireclient.module.kit.empty_name.contents": "Empty kit name field",
+
+  "fireclient.module.kit.generic.load_failure.title": "Failed to load \"%1$s\"",
+  "fireclient.module.kit.load.failure.invalid_permission.contents": "Invalid permissions",
+
+  "fireclient.module.kit.undo.success.title": "Success",
+  "fireclient.module.kit.load.success.title": "Successfully loaded \"%1$s\"",
+
+  "fireclient.module.kit.load.waiting_gmc.title": "Loading \"%1$s\"...",
+  "fireclient.module.kit.load.waiting_gmc.contents": "Waiting for Creative Mode",
+
+  "fireclient.module.kit.preview.failure.title": "Failed to preview \"%1$s\"",
+
+  "fireclient.module.kit.create_clipboard.success.title": "Successfully pasted \"%1$s\"",
+  "fireclient.module.kit.create_clipboard.success.contents": "Imported via clipboard",
+
+  "fireclient.module.kit.create_clipboard.failure.title": "Failed to paste \"%1$s\"",
+
+  "fireclient.module.kit.recycle.success.title": "Recycled \"%1$s\"",
+  "fireclient.module.kit.recycle.success.contents": "It will be deleted next startup",
+
+  "fireclient.module.kit.recycle.failure.title": "Failed to delete \"%1$s\"",
+  "fireclient.module.kit.recycle.failure.contents": "The kit won't be deleted",
+
+  "fireclient.module.kit.drag_and_drop.success.title": "Successfully dragged \"%1$s\"",
+  "fireclient.module.kit.drag_and_drop.success.contents": "Imported via drag & drop",
+
+  "fireclient.module.kit.drag_and_drop.failure.title": "Failed to drag kit \"%1$s\"",
+  "fireclient.module.kit.drag_and_drop.no_file.contents": "Invalid file",
+
+  "fireclient.module.kit.edit.success.name": "Successfully saved \"%1$s\"",
+  "fireclient.module.kit.edit.success.contents": "The old kit was recycled",
+
+  "fireclient.module.kit.edit.failure.name": "Failed to save \"%1$s\"",
+  "fireclient.module.kit.edit.invalid_editor_inventory": "Invalid editor inventory",
+
+  "fireclient.module.kit.edit.revert.name": "Successfully reverted \"%1$s\"",
+  "fireclient.module.kit.edit.revert.contents": "No changes were made",
+
+  "fireclient.module.kit.server.fail.rate_limit": "Please slow down! Rate limited!",
+  "fireclient.module.kit.share.failure.generic": "Failed to upload \"%1$s\"",
+  "fireclient.module.kit.share.failure.too_large": "Kit file too large",
+
+  "fireclient.module.kit.share.message": "%1$s has shared \"%2$s\" %3$s",
+  "fireclient.module.kit.share.download.name": "[Download]",
+  "fireclient.module.kit.share.download.tooltip": "Download \"%1$s\"",
+
+  "fireclient.module.kit.download.success": "Successfully downloaded \"%1$s\"",
+  "fireclient.module.kit.download.failure.generic": "Failed to download \"%1$s\"",
+  "fireclient.module.kit.download.failure.no_kit": "Kit does not exist",
+
+  "fireclient.module.kit.update.success": "Successfully updated kits",
+
+  "fireclient.screen.edit_kit.title": "Edit \"%1$s\"",
+  "fireclient.screen.preview_kit.title": "Preview \"%1$s\"",
+
+  "fireclient.screen.edit_kit.save.name": "\uD83D\uDCBE Save",
+  "fireclient.screen.edit_kit.save.tooltip": "Save changes to \"%1$s\"",
+
+  "fireclient.screen.edit_kit.undo.name": "↶ Undo",
+  "fireclient.screen.edit_kit.undo.tooltip": "Undo changes to \"%1$s\"",
+
+  "fireclient.module.local_skin.name": "Local Skin",
+  "fireclient.module.local_skin.description": "Applies local skin files and updates them in realtime",
+  "fireclient.module.local_skin.open_folder.name": "\uD83D\uDCC2",
+  "fireclient.module.local_skin.open_folder.tooltip": "Open folder",
+
+  "fireclient.module.local_skin.apply.name": "✔",
+  "fireclient.module.local_skin.apply.tooltip": "Apply \"%1$s\"",
+
+  "fireclient.module.local_skin.slim.name": "Slim",
+  "fireclient.module.local_skin.slim.tooltip": "Make \"%1$s\" slim",
+
+  "fireclient.module.local_skin.select_skin.name": "Skin",
+  "fireclient.module.local_skin.select_skin.tooltip": "Show skins",
+  "fireclient.module.local_skin.select_cape.name": "Cape",
+  "fireclient.module.local_skin.select_cape.tooltip": "Show capes",
+
+  "fireclient.module.sounds.name": "Sounds",
+  "fireclient.module.sounds.description": "Allows the volume of sounds to be changed and even muted",
+
+  "fireclient.module.sounds.toggle_sound.tooltip": "Toggle \"%1$s\"",
+
+  "fireclient.module.sounds.add_sound.name": "+",
+  "fireclient.module.sounds.add_sound.tooltip": "Add sound",
+
+  "fireclient.module.sounds.remove_sound.name": "-",
+  "fireclient.module.sounds.remove_sound.tooltip": "Remove \"%1$s\"",
+
+  "fireclient.module.sounds.add_sound.failure.title": "Failed to add sound",
+  "fireclient.module.sounds.add_sound.invalid_id.contents": "Invalid identifier",
+  "fireclient.module.sounds.add_sound.invalid_sound.contents": "Sound not found",
+  "fireclient.module.sounds.add_sound.already_exists.contents": "Sound already in list",
+  
+  "fireclient.module.sounds.volume.message": "%1$s",
+  
+  "fireclient.module.sounds.technical_names.name": "👁",
+  "fireclient.module.sounds.technical_names.tooltip": "Shows the sound's name in readable form instead of its in-game ID",
+
+  "fireclient.module.nametag.name": "Nametag",
+  "fireclient.module.nametag.description": "Allows the modification of nametags",
+
+  "fireclient.module.nametag.darker_background.name": "Darker",
+  "fireclient.module.nametag.darker_background.tooltip": "Gives nametags a darker background, making them easier to see",
+  "fireclient.module.nametag.show_own.name": "Show Own",
+  "fireclient.module.nametag.show_own.tooltip": "Makes your own nametag visible",
+  "fireclient.module.nametag.text_shadow.name": "Text Shadow",
+  "fireclient.module.nametag.text_shadow.tooltip": "Shows a text shadow for the nametag's text",
+  "fireclient.module.nametag.unlimit_nametag.name": "Unlimit BelowName",
+  "fireclient.module.nametag.unlimit_nametag.tooltip": "Removes the distance limit of the below name scoreboard",
+
+  "fireclient.module.particles.name": "Particles",
+  "fireclient.module.particles.description": "Allows certain particles to be disabled",
+
+  "fireclient.module.particles.add_particle.name": "+",
+  "fireclient.module.particles.add_particle.tooltip": "Add particle",
+
+  "fireclient.module.particles.remove_particle.name": "-",
+  "fireclient.module.particles.remove_particle.tooltip": "Remove \"%1$s\"",
+
+  "fireclient.module.particles.toggle_particle.tooltip": "Toggle \"%1$s\"",
+
+  "fireclient.module.particles.add_particle.failure.title": "Failed to add particle",
+  "fireclient.module.particles.add_particle.already_exists.contents": "Particle already in list",
+
+  "fireclient.module.perspective.name": "Perspective",
+  "fireclient.module.perspective.description": "Allows you to look around in Third Person without moving your player's head",
+
+  "fireclient.module.perspective.zoom.name": "Zoom In/Out",
+  "fireclient.module.perspective.zoom.tooltip": "Zooms the Perspective in and out when using the scroll wheel",
+
+  "fireclient.module.reach_display.name": "Reach Display",
+  "fireclient.module.reach_display.description": "Shows how far away your target is",
+
+  "fireclient.module.reach_display.hit_only.name": "Hit Only",
+  "fireclient.module.reach_display.hit_only.tooltip": "Makes the reach only update when you attack an entity",
+
+  "fireclient.module.saturation_display.name": "Saturation Display",
+  "fireclient.module.saturation_display.description": "Shows your saturation",
+
+  "fireclient.module.shadow.name": "Shadows",
+  "fireclient.module.shadow.description": "Modifies shadow rendering",
+
+  "fireclient.module.shadow.distance_effect.name": "Distance Effect",
+  "fireclient.module.shadow.distance_effect.tooltip": "Entity distance to the camera affects the opacity of shadows (vanilla behavior)",
+  "fireclient.module.shadow.increase_height.name": "Increase Height",
+  "fireclient.module.shadow.increase_height.tooltip": "Increases shadow height to 20 blocks",
+  "fireclient.module.shadow.fullbright.name": "Fullbright",
+  "fireclient.module.shadow.fullbright.tooltip": "Makes shadow opacity not depend on light level",
+  "fireclient.module.shadow.render_on_all.name": "Render on All",
+  "fireclient.module.shadow.render_on_all.tooltip": "Allows shadows to render on non-full cube blocks",
+
+  "fireclient.module.sign.name": "Signs",
+  "fireclient.module.sign.description": "Modifies the behavior of signs",
+
+  "fireclient.module.sign.disable_gui.name": "Disable GUI",
+  "fireclient.module.sign.disable_gui.description": "Prevents the sign GUI from being opened",
+  "fireclient.module.sign.disable_rendering.name": "Disable Rendering",
+  "fireclient.module.sign.disable_rendering.description": "Blocks signs from being rendered",
+
+  "fireclient.module.subtitles.name": "Subtitles",
+  "fireclient.module.subtitles.description": "Modifies the subtitles hud",
+
+  "fireclient.module.subtitles.visible.name": "Visible",
+  "fireclient.module.subtitles.visible.tooltip": "Toggles the subtitles' visibility",
+
+  "fireclient.module.tps_display.name": "TPS Display",
+  "fireclient.module.tps_display.description": "Shows the estimated server Ticks Per Second",
+
+  "fireclient.module.zoom.name": "Zoom",
+  "fireclient.module.zoom.description": "Increases the camera's zoom level",
+
+  "fireclient.module.zoom.scroll_zoom.name": "Scroll Zoom",
+  "fireclient.module.zoom.scroll_zoom.tooltip": "Changes the zoom amount when scrolling the mouse wheel",
+
+  "fireclient.screen.generic.header": "FireClient Config",
+
+  "fireclient.screen.main_config.title": "FireClient Main Config",
+  "fireclient.screen.main_config.tutorial": "Shift to snap | Ctrl for transform | Right Click to scale",
+  
+  "fireclient.screen.main_config.modules.name": "Modules",
+  "fireclient.screen.main_config.modules.tooltip": "Configure various modules",
+  "fireclient.screen.main_config.settings.name": "FireClient Settings",
+  "fireclient.screen.main_config.settings.tooltip": "Configure FireClient settings",
+  "fireclient.screen.main_config.exit.name": "Exit",
+  "fireclient.screen.main_config.exit.tooltip": "Return to game",
+  
+  "fireclient.screen.settings.title": "FireClient Options",
+  "fireclient.screen.settings.header": "Settings",
+  "fireclient.screen.settings.back.name": "Back",
+  "fireclient.screen.settings.back.tooltip": "Return to the Main Config Screen",
+  
+  "fireclient.screen.module_select.title": "Module Select",
+  "fireclient.screen.module_select.header": "Modules Config",
+  "fireclient.screen.module_select.tutorial": "Right click to favorite",
+
+  "fireclient.module.toggle_toggle_sneak.name": "Toggle ToggleSneak",
+  "fireclient.module.toggle_toggle_sneak.description": "Allows you to toggle the toggle sneak option when pressing the keybind",
+
+  "fireclient.settings.fix_trident_riptide.name": "Fix Riptide Shields",
+  "fireclient.settings.fix_trident_riptide.description": "Fixes shields obstructing the view when riptiding with a trident",
+
+  "fireclient.settings.branding.name": "Branding",
+  "fireclient.settings.branding.description": "Optional branding message that shows in menus",
+
+  "fireclient.settings.prevent_untoggle_sticky.name": "Fix Untoggling Keys",
+  "fireclient.settings.prevent_untoggle_sticky.description": "Prevents untoggling sticky keys (Sprint & Sneak) when respawning",
+
+  "fireclient.settings.hazeli_mode.name": "Hazeli Mode",
+  "fireclient.settings.hazeli_mode.description": "...",
+
+  "fireclient.settings.dont_reset_death.name": "Fix Death Buttons",
+  "fireclient.settings.dont_reset_death.description": "Fixes the Death Screen buttons being reset when the window size changes",
+
+  "fireclient.settings.extinguish_fix.name": "Fix Extinguish Sound",
+  "fireclient.settings.extinguish_fix.description": "Fixes the fire extinguish sound being spammed",
+
+  "fireclient.settings.show_hidden_modules.name": "Show Hidden Modules",
+  "fireclient.settings.show_hidden_modules.description": "Shows module outlines when they are hidden",
+
+  "fireclient.settings.show_tutorial_text.name": "Show Tutorial Text",
+  "fireclient.settings.show_tutorial_text.description": "Shows the transform tutorial in the Main Config screen",
+
+  "fireclient.settings.prevent_hiding_entries.name": "Prevent Hiding Entries",
+  "fireclient.settings.prevent_hiding_entries.description": "Prevents hiding the player list entries in the tab list",
+
+  "fireclient.settings.show_ping_number.name": "Show Ping Number",
+  "fireclient.settings.show_ping_number.description": "Shows a player's latency as a number instead of bars",
+
+  "fireclient.settings.blaze_powder_fill.name": "Blaze Powder Fill",
+  "fireclient.settings.blaze_powder_fill.description": "Prevents blaze powder from being autofilled into the fuel slot (makes it an ingredient instead)",
+
+  "fireclient.settings.show_modules_debug.name": "Show GUI in F3",
+  "fireclient.settings.show_modules_debug.description": "Shows the module guis when the F3 debug screen is open",
+
+  "fireclient.settings.cache_uuid.name": "Cache Entity UUID",
+  "fireclient.settings.cache_uuid.description": "Caches the targeted entity UUID when you first open the chat screen, allowing you to use it in commands",
+
+  "fireclient.settings.disable_gradient.name": "Disable Gradients",
+  "fireclient.settings.disable_gradient.description": "Disables the gradient text used in most modules in FireClient",
+
+  "fireclient.settings.chat_history.name": "Length: %1$s",
+  "fireclient.settings.chat_history.description": "Modifies the chat history length",
+
+  "fireclient.settings.cap_particle_count.name": "Cap Particle Count",
+  "fireclient.settings.cap_particle_count.description": "Limits the incoming particle count to prevent crash issues",
+
+  "fireclient.settings.chat_history.text": "Length: %1$s",
+  "fireclient.settings.chat_history.unlimited": "Unlimited",
+
+  "fireclient.settings.clearview.name": "Clearview",
+  "fireclient.settings.clearview.description": "Hide status effect particles for yourself",
+
+  "fireclient.settings.prevent_pack_clear.name": "Prevent Pack Clear",
+  "fireclient.settings.prevent_pack_clear.description": "Prevents the resource pack list from being cleared when a load error occurs",
+
+  "fireclient.settings.no_reload_overlay.name": "No Reload Overlay",
+  "fireclient.settings.no_reload_overlay.description": "Speeds up the reload overlay and prevents it from disabling input",
+
+  "fireclient.settings.dont_hit_dead.name": "Don't Hit Dead",
+  "fireclient.settings.dont_hit_dead.description": "Prevents dead entities from blocking hits",
+
+  "fireclient.settings.fix_sprint_swim.name": "Fix Sprint Swim",
+  "fireclient.settings.fix_sprint_swim.description": "Fixes a client-server desync where you may get stuck in a block while swimming",
+
+  "fireclient.settings.prioritize_players.name": "Prioritize Players",
+  "fireclient.settings.prioritize_players.description": "Gives players priority in the command auto-complete the more times they are used",
+
+  "fireclient.settings.autofill_lapis.name": "Autofill Lapis",
+  "fireclient.settings.autofill_lapis.description": "Automatically puts Lapis Lazuli into the enchanting screen when opened",
+
+  "fireclient.settings.hide_item_names.name": "Hide Item Names",
+  "fireclient.settings.hide_item_names.description": "Hides the item select tooltip above the hotbar",
+
+  "fireclient.settings.extra_screenshot_options.name": "Screenshot Options",
+  "fireclient.settings.extra_screenshot_options.description": "Provides clickable options when screenshotting",
+  "fireclient.settings.extra_screenshot_options.copy.message": "[COPY]",
+  "fireclient.settings.extra_screenshot_options.copy.hover": "Copy \"%1$s\" to the clipboard",
+
+  "fireclient.settings.fog_mode.name": "F0g Mode",
+  "fireclient.settings.fog_mode.description": "...",
+
+  "fireclient.keybind.generic.unbound_key.long": "Unbound",
+  "fireclient.keybind.generic.unbound_key.short": "N/A",
+  "fireclient.keybind.generic.toggle.name": "Toggle",
+  "fireclient.keybind.generic.toggle_visibility.description": "Toggle %1$s's visibility",
+  "fireclient.keybind.generic.toggle.description": "Toggle %1$s",
+  "fireclient.keybind.generic.use.name": "Use",
+  "fireclient.keybind.generic.use.description": "Use %1$s"
+}

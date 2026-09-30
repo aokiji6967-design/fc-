@@ -22,7 +22,7 @@ import org.loveroo.fireclient.data.Color;
 import org.loveroo.fireclient.data.FireClientOption;
 import org.loveroo.fireclient.keybind.KeybindManager;
 import org.loveroo.fireclient.modules.AngleDisplayModule;
-import org.loveroo.fireclient.modules.ArmorDisplayModule;
+import org.loveroo.fireclient.modules.ArmorHudModule;
 import org.loveroo.fireclient.modules.AutoMessageModule;
 import org.loveroo.fireclient.modules.BigItemsModule;
 import org.loveroo.fireclient.modules.BlockOutlineModule;
@@ -43,6 +43,7 @@ import org.loveroo.fireclient.modules.LocalSkinModule;
 import org.loveroo.fireclient.modules.ModuleBase;
 import org.loveroo.fireclient.modules.NametagModule;
 import org.loveroo.fireclient.modules.ParticlesModule;
+import org.loveroo.fireclient.modules.PotionHudModule;
 import org.loveroo.fireclient.modules.PerspectiveModule;
 import org.loveroo.fireclient.modules.ReachDisplayModule;
 import org.loveroo.fireclient.modules.SaturationDisplayModule;
@@ -112,7 +113,8 @@ public class FireClientside implements ClientModInitializer {
     }
 
     private void initModules() {
-        registerModule(new ArmorDisplayModule());
+        registerModule(new ArmorHudModule());
+        registerModule(new PotionHudModule());
         registerModule(new CoordinatesModule());
         registerModule(new ToggleToggleSneakModule());
         registerModule(new FPSDisplayModule());

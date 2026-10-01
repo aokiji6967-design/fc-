@@ -18,17 +18,7 @@
   "fireclient.module.angle_display.name": "Disposição do Ângulo",
   "fireclient.module.angle_display.description": "Dispõe o Ângulo",
 
-  "fireclient.module.armor_display.name": "Disposição da Armadura",
-  "fireclient.module.armor_display.description": "Dispõe a durabilidade e o tempo de recarga da sua armadura",
-  "fireclient.module.armor_display.lock_button.name": "Bloqueado",
-  "fireclient.module.armor_display.lock_button.tooltip": "Bloqueia a posição na barra de atalhos",
-  "fireclient.module.armor_display.mode_toggle.name": "Modo: %1$s",
-  "fireclient.module.armor_display.mode_toggle.tooltip": "Muda o estilo de exibição",
-  "fireclient.module.armor_display.show_items.name": "Mostrar Armadura Equipada",
-  "fireclient.module.armor_display.show_items.tooltip": "Faz que o modo texto mostre as peças de armadura equipadas", 
 
-  "fireclient.module.armor_display.mode.text": "Texto",
-  "fireclient.module.armor_display.mode.bars": "Baras",
 
   "fireclient.module.auto_message.name": "Auto Mensagem",
   "fireclient.module.auto_message.description": "Introduz automaticamente o último comando digitado '/msg' ou equivalente para que possa enviar uma mensagem rapidamente a alguém quando pressiona a tecla de atalho",

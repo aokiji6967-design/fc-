@@ -1,7 +1,6 @@
 package org.loveroo.fireclient.modules;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import org.loveroo.fireclient.client.FireClientside;
@@ -41,6 +40,9 @@ public class PotionHudModule extends ModuleBase {
     private static final int TEXT_GAP = 3;
     private static final float SMALL_TEXT = 0.75f;
 
+    private static final int PADDING = 3;
+    private static final int SPACING = 2;
+
     // ---- display ----
     @JsonOption(name = "mode")
     private Mode mode = Mode.DETAILED;
@@ -48,11 +50,8 @@ public class PotionHudModule extends ModuleBase {
     @JsonOption(name = "layout")
     private Layout layout = Layout.VERTICAL;
 
-    @JsonOption(name = "spacing")
-    private int spacing = 2;
-
-    @JsonOption(name = "show_icon")
-    private boolean showIcon = true;
+    @JsonOption(name = "hide_vanilla")
+    private boolean hideVanilla = true;
 
     @JsonOption(name = "show_name")
     private boolean showName = true;
@@ -63,12 +62,6 @@ public class PotionHudModule extends ModuleBase {
     @JsonOption(name = "show_duration")
     private boolean showDuration = true;
 
-    @JsonOption(name = "roman_levels")
-    private boolean romanLevels = true;
-
-    @JsonOption(name = "hide_level_one")
-    private boolean hideLevelOne = true;
-
     // ---- filters ----
     @JsonOption(name = "show_beneficial")
     private boolean showBeneficial = true;
@@ -76,21 +69,9 @@ public class PotionHudModule extends ModuleBase {
     @JsonOption(name = "show_harmful")
     private boolean showHarmful = true;
 
-    @JsonOption(name = "show_ambient")
-    private boolean showAmbient = true;
-
-    @JsonOption(name = "sort_by_duration")
-    private boolean sortByDuration = false;
-
-    @JsonOption(name = "hide_vanilla")
-    private boolean hideVanilla = true;
-
     // ---- expiring warning ----
     @JsonOption(name = "warn_enabled")
     private boolean warnEnabled = true;
-
-    @JsonOption(name = "warn_flash")
-    private boolean warnFlash = true;
 
     @JsonOption(name = "warn_seconds")
     private int warnSeconds = 10;
@@ -102,32 +83,24 @@ public class PotionHudModule extends ModuleBase {
     @JsonOption(name = "show_border")
     private boolean showBorder = false;
 
-    @JsonOption(name = "cell_padding")
-    private int cellPadding = 3;
+    @JsonOption(name = "bg_opacity")
+    private int backgroundOpacity = 60;
 
-    @JsonOption(name = "color_names")
-    private boolean colorNames = true;
+    @JsonOption(name = "bg_color")
+    private String backgroundColor = "000000";
 
-    @JsonOption(name = "color_background")
-    private String backgroundColor = "99000000";
+    @JsonOption(name = "border_color")
+    private String borderColor = "3C3C46";
 
-    @JsonOption(name = "color_border")
-    private String borderColor = "FF3C3C46";
+    @JsonOption(name = "text_color")
+    private String textColor = "FFFFFF";
 
-    @JsonOption(name = "color_text")
-    private String textColor = "FFFFFFFF";
-
-    @JsonOption(name = "color_beneficial")
-    private String beneficialColor = "FF7DE07D";
-
-    @JsonOption(name = "color_harmful")
-    private String harmfulColor = "FFFF6B6B";
-
-    @JsonOption(name = "color_warn")
-    private String warnColor = "FFFF5555";
+    @JsonOption(name = "warn_color")
+    private String warnColor = "FF5555";
 
     public PotionHudModule() {
-        super(new ModuleData("potion_hud", "⚗", color));
+        super(new ModuleData("potion_hud", "⚗", color,
+            "Potion HUD", "Shows your active status effects as icons or a detailed list, and warns you when they are about to run out"));
 
         getData().setWidth(90);
         getData().setHeight(24);
@@ -192,10 +165,6 @@ public class PotionHudModule extends ModuleBase {
         for(var entry : raw) {
             var category = entry.type().value().getCategory();
 
-            if(entry.ambient() && !showAmbient) {
-                continue;
-            }
-
             if(category == StatusEffectCategory.BENEFICIAL && !showBeneficial) {
                 continue;
             }
@@ -207,26 +176,19 @@ public class PotionHudModule extends ModuleBase {
             entries.add(entry);
         }
 
-        if(sortByDuration) {
-            entries.sort(Comparator.comparingInt((entry) -> (entry.infinite()) ? Integer.MAX_VALUE : entry.duration()));
-        }
-
         return entries;
     }
 
     private String levelString(Entry entry) {
         var level = entry.amplifier() + 1;
 
-        if(hideLevelOne && level == 1) {
-            return null;
-        }
-
-        return (romanLevels) ? HudUtil.roman(level) : String.valueOf(level);
+        // level I is not shown, like in vanilla
+        return (level == 1) ? null : HudUtil.roman(level);
     }
 
     private String durationString(Entry entry) {
         if(entry.infinite()) {
-            return Text.translatable("fireclient.module.potion_hud.infinite").getString();
+            return "Infinite";
         }
 
         return HudUtil.formatDuration(entry.duration());
@@ -237,24 +199,10 @@ public class PotionHudModule extends ModuleBase {
     }
 
     /**
-     * True when the warning color should currently be used (handles the flashing)
+     * True when the warning color should currently be used (it blinks)
      */
     private boolean warnActive(Entry entry) {
-        return isExpiring(entry) && (!warnFlash || HudUtil.flashOn());
-    }
-
-    private int nameColor(Entry entry) {
-        var normal = HudUtil.parseColor(textColor, 0xFFFFFFFF, true);
-
-        if(!colorNames) {
-            return normal;
-        }
-
-        return switch(entry.type().value().getCategory()) {
-            case BENEFICIAL -> HudUtil.parseColor(beneficialColor, 0xFF7DE07D, true);
-            case HARMFUL -> HudUtil.parseColor(harmfulColor, 0xFFFF6B6B, true);
-            default -> normal;
-        };
+        return isExpiring(entry) && HudUtil.flashOn();
     }
 
     private Cell buildCell(Entry entry) {
@@ -266,8 +214,8 @@ public class PotionHudModule extends ModuleBase {
         if(mode == Mode.COMPACT) {
             var durationWidth = (duration.isEmpty()) ? 0 : (int)Math.ceil(text.getWidth(duration) * SMALL_TEXT);
 
-            var w = (cellPadding * 2) + Math.max(ICON_SIZE, durationWidth);
-            var h = (cellPadding * 2) + ICON_SIZE + ((duration.isEmpty()) ? 0 : 1 + (int)Math.ceil(8 * SMALL_TEXT));
+            var w = (PADDING * 2) + Math.max(ICON_SIZE, durationWidth);
+            var h = (PADDING * 2) + ICON_SIZE + ((duration.isEmpty()) ? 0 : 1 + (int)Math.ceil(8 * SMALL_TEXT));
 
             return new Cell(entry, "", (showLevel) ? level : null, duration, w, h);
         }
@@ -291,10 +239,8 @@ public class PotionHudModule extends ModuleBase {
         var textHeight = (lines == 0) ? 0 : (lines * 9) + (lines - 1);
         var textWidth = Math.max(text.getWidth(titleText), text.getWidth(duration));
 
-        var iconWidth = (showIcon) ? ICON_SIZE : 0;
-
-        var w = (cellPadding * 2) + iconWidth + ((showIcon && textWidth > 0) ? TEXT_GAP : 0) + textWidth;
-        var h = (cellPadding * 2) + Math.max((showIcon) ? ICON_SIZE : 0, textHeight);
+        var w = (PADDING * 2) + ICON_SIZE + ((textWidth > 0) ? TEXT_GAP : 0) + textWidth;
+        var h = (PADDING * 2) + Math.max(ICON_SIZE, textHeight);
 
         return new Cell(entry, titleText, level, duration, w, h);
     }
@@ -324,7 +270,7 @@ public class PotionHudModule extends ModuleBase {
             var cell = buildCell(entry);
 
             // nothing to show for this effect with the current settings
-            if(cell.h() <= (cellPadding * 2)) {
+            if(cell.h() <= (PADDING * 2)) {
                 continue;
             }
 
@@ -356,17 +302,17 @@ public class PotionHudModule extends ModuleBase {
             drawCell(context, cell, x, y, w, h);
 
             if(horizontal) {
-                x += w + spacing;
+                x += w + SPACING;
             }
             else {
-                y += h + spacing;
+                y += h + SPACING;
             }
         }
 
         endTransform(context.getMatrices());
 
-        getData().setWidth((horizontal) ? (x - spacing) : maxWidth);
-        getData().setHeight((horizontal) ? maxHeight : (y - spacing));
+        getData().setWidth((horizontal) ? (x - SPACING) : maxWidth);
+        getData().setHeight((horizontal) ? maxHeight : (y - SPACING));
     }
 
     private void drawCell(DrawContext context, Cell cell, int x, int y, int w, int h) {
@@ -374,18 +320,19 @@ public class PotionHudModule extends ModuleBase {
         var entry = cell.entry();
 
         HudUtil.drawBox(context, x, y, w, h,
-            showBackground, HudUtil.parseColor(backgroundColor, 0x99000000, false),
-            showBorder, HudUtil.parseColor(borderColor, 0xFF3C3C46, false));
+            showBackground, HudUtil.parseColorWithOpacity(backgroundColor, 0xFF000000, backgroundOpacity),
+            showBorder, HudUtil.parseColor(borderColor, 0xFF3C3C46));
 
         var warn = warnActive(entry);
-        var warningColor = HudUtil.parseColor(warnColor, 0xFFFF5555, true);
+        var normalColor = HudUtil.parseColor(textColor, 0xFFFFFFFF);
+        var warningColor = HudUtil.parseColor(warnColor, 0xFFFF5555);
 
-        var titleColor = (warn) ? warningColor : nameColor(entry);
-        var durationColor = (warn) ? warningColor : HudUtil.parseColor(textColor, 0xFFFFFFFF, true);
+        var titleColor = (warn) ? warningColor : normalColor;
+        var durationColor = titleColor;
 
         if(mode == Mode.COMPACT) {
             var iconX = x + ((w - ICON_SIZE) / 2);
-            var iconY = y + cellPadding;
+            var iconY = y + PADDING;
 
             drawIcon(context, entry, iconX, iconY);
 
@@ -402,12 +349,9 @@ public class PotionHudModule extends ModuleBase {
             return;
         }
 
-        var textX = x + cellPadding;
+        var textX = x + PADDING + ICON_SIZE + TEXT_GAP;
 
-        if(showIcon) {
-            drawIcon(context, entry, x + cellPadding, y + ((h - ICON_SIZE) / 2));
-            textX += ICON_SIZE + TEXT_GAP;
-        }
+        drawIcon(context, entry, x + PADDING, y + ((h - ICON_SIZE) / 2));
 
         var hasTitle = !cell.title().isEmpty();
         var hasDuration = !cell.duration().isEmpty();
@@ -457,45 +401,33 @@ public class PotionHudModule extends ModuleBase {
 
         var ui = new HudUi(base, "potion_hud");
 
-        ui.header("section_display")
-            .toggle("visible", getData()::isVisible, getData()::setVisible)
-            .cycle("mode", Mode.values(), () -> mode, (value) -> mode = value)
-            .cycle("layout", Layout.values(), () -> layout, (value) -> layout = value)
-            .slider("spacing", 0, 12, () -> spacing, (value) -> spacing = value)
-            .toggle("hide_vanilla", () -> hideVanilla, (value) -> hideVanilla = value)
+        ui.header("Display")
+            .toggle("Visible", getData()::isVisible, getData()::setVisible)
+            .cycle("Mode", Mode.values(), () -> mode, (value) -> mode = value)
+            .cycle("Layout", Layout.values(), () -> layout, (value) -> layout = value)
+            .toggle("Hide Vanilla Effects", () -> hideVanilla, (value) -> hideVanilla = value)
 
-            .header("section_info")
-            .toggle("show_icon", () -> showIcon, (value) -> showIcon = value)
-            .toggle("show_name", () -> showName, (value) -> showName = value)
-            .toggle("show_level", () -> showLevel, (value) -> showLevel = value)
-            .toggle("show_duration", () -> showDuration, (value) -> showDuration = value)
-            .toggle("roman_levels", () -> romanLevels, (value) -> romanLevels = value)
-            .toggle("hide_level_one", () -> hideLevelOne, (value) -> hideLevelOne = value)
+            .header("Show")
+            .toggle("Name", () -> showName, (value) -> showName = value)
+            .toggle("Level", () -> showLevel, (value) -> showLevel = value)
+            .toggle("Time Left", () -> showDuration, (value) -> showDuration = value)
+            .toggle("Good Effects", () -> showBeneficial, (value) -> showBeneficial = value)
+            .toggle("Bad Effects", () -> showHarmful, (value) -> showHarmful = value)
 
-            .header("section_filters")
-            .toggle("show_beneficial", () -> showBeneficial, (value) -> showBeneficial = value)
-            .toggle("show_harmful", () -> showHarmful, (value) -> showHarmful = value)
-            .toggle("show_ambient", () -> showAmbient, (value) -> showAmbient = value)
-            .toggle("sort_by_duration", () -> sortByDuration, (value) -> sortByDuration = value)
+            .header("Running Out Warning")
+            .toggle("Warning", () -> warnEnabled, (value) -> warnEnabled = value)
+            .slider("Warn Under", 1, 60, "s", () -> warnSeconds, (value) -> warnSeconds = value)
 
-            .header("section_warning")
-            .toggle("warn_enabled", () -> warnEnabled, (value) -> warnEnabled = value)
-            .toggle("warn_flash", () -> warnFlash, (value) -> warnFlash = value)
-            .slider("warn_seconds", 1, 60, () -> warnSeconds, (value) -> warnSeconds = value)
+            .header("Style")
+            .toggle("Background", () -> showBackground, (value) -> showBackground = value)
+            .toggle("Border", () -> showBorder, (value) -> showBorder = value)
+            .slider("Opacity", 0, 100, "%", () -> backgroundOpacity, (value) -> backgroundOpacity = value)
 
-            .header("section_style")
-            .toggle("show_background", () -> showBackground, (value) -> showBackground = value)
-            .toggle("show_border", () -> showBorder, (value) -> showBorder = value)
-            .slider("cell_padding", 0, 8, () -> cellPadding, (value) -> cellPadding = value)
-            .toggle("color_names", () -> colorNames, (value) -> colorNames = value)
-
-            .header("section_colors")
-            .color("color_background", () -> backgroundColor, (value) -> backgroundColor = value, 0x99000000)
-            .color("color_border", () -> borderColor, (value) -> borderColor = value, 0xFF3C3C46)
-            .color("color_text", () -> textColor, (value) -> textColor = value, 0xFFFFFFFF)
-            .color("color_beneficial", () -> beneficialColor, (value) -> beneficialColor = value, 0xFF7DE07D)
-            .color("color_harmful", () -> harmfulColor, (value) -> harmfulColor = value, 0xFFFF6B6B)
-            .color("color_warn", () -> warnColor, (value) -> warnColor = value, 0xFFFF5555);
+            .header("Colors (hex)")
+            .color("Background", () -> backgroundColor, (value) -> backgroundColor = value)
+            .color("Border", () -> borderColor, (value) -> borderColor = value)
+            .color("Text", () -> textColor, (value) -> textColor = value)
+            .color("Warning", () -> warnColor, (value) -> warnColor = value);
 
         widgets.add(ui.build());
         return widgets;
@@ -511,13 +443,35 @@ public class PotionHudModule extends ModuleBase {
         FireClientside.saveConfig();
     }
 
-    public enum Mode {
-        DETAILED,
-        COMPACT
+    public enum Mode implements HudUi.Labeled {
+        DETAILED("Detailed"),
+        COMPACT("Icons Only");
+
+        private final String label;
+
+        Mode(String label) {
+            this.label = label;
+        }
+
+        @Override
+        public String label() {
+            return label;
+        }
     }
 
-    public enum Layout {
-        VERTICAL,
-        HORIZONTAL
+    public enum Layout implements HudUi.Labeled {
+        VERTICAL("Vertical"),
+        HORIZONTAL("Horizontal");
+
+        private final String label;
+
+        Layout(String label) {
+            this.label = label;
+        }
+
+        @Override
+        public String label() {
+            return label;
+        }
     }
 }

@@ -52,6 +52,19 @@ public class ModuleData {
         this.description = Text.translatable("fireclient.module." + id + ".description");
     }
 
+    /**
+     * Same as above, but with built in English text that is used when the language file has no entry.
+     * Lets a module work without touching the lang files (a lang entry, if present, still wins).
+     */
+    public ModuleData(String id, String emoji, Color color, String fallbackName, String fallbackDescription) {
+        this.id = id;
+        this.emoji = Text.literal(emoji + " ").withColor(color.toInt());
+
+        name = Text.translatableWithFallback("fireclient.module." + id + ".name", fallbackName);
+        this.shownName = this.emoji.copy().append(getName().withColor(0xFFFFFFFF));
+        this.description = Text.translatableWithFallback("fireclient.module." + id + ".description", fallbackDescription);
+    }
+
     public MutableText getName() {
         return name;
     }

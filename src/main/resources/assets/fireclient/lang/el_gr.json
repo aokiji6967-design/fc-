@@ -18,17 +18,7 @@
   "fireclient.module.angle_display.name": "Επείδειξη Γωνίας",
   "fireclient.module.angle_display.description": "Δείχνει την γωνία όψης σου",
 
-  "fireclient.module.armor_display.name": "Επείδειξη Πανοπλίας",
-  "fireclient.module.armor_display.description": "Δείχνει την ανθεκτικότητα και τον χρόνο αναμονής της πανοπλίας σας",
-  "fireclient.module.armor_display.lock_button.name": "Κλειδωμένο",
-  "fireclient.module.armor_display.lock_button.tooltip": "Κλειδώνει την θέση στην γραμμή εργαλειών",
-  "fireclient.module.armor_display.mode_toggle.name": "Τρόπος: %1$s",
-  "fireclient.module.armor_display.mode_toggle.tooltip": "Αλλάζει το στυλ εμφάνισης",
-  "fireclient.module.armor_display.show_items.name": "Εμφάνιση Εξοπλισμένων Αντικειμένων",
-  "fireclient.module.armor_display.show_items.tooltip": "Κάνει τη λειτουργία Κειμένου να εμφανίζει τα εξοπλισμένα αντικείμενα",
 
-  "fireclient.module.armor_display.mode.text": "Κείμενο",
-  "fireclient.module.armor_display.mode.bars": "Μπάρες",
 
   "fireclient.module.auto_message.name": "Αυτόματο Μήνυμα",
   "fireclient.module.auto_message.description": "Εισάγει αυτόματα την τελευταία σας '/msg' ή ισοδύναμη εντολή, ώστε να μπορείτε να στείλετε ξανά μήνυμα γρήγορα σε κάποιον πατώντας ένα πλήκτρο της επιλογής σας",

@@ -44,6 +44,7 @@ import org.loveroo.fireclient.modules.ModuleBase;
 import org.loveroo.fireclient.modules.NametagModule;
 import org.loveroo.fireclient.modules.ParticlesModule;
 import org.loveroo.fireclient.modules.PotionHudModule;
+import org.loveroo.fireclient.modules.SprintDisplayModule;
 import org.loveroo.fireclient.modules.PerspectiveModule;
 import org.loveroo.fireclient.modules.ReachDisplayModule;
 import org.loveroo.fireclient.modules.SaturationDisplayModule;
@@ -115,6 +116,7 @@ public class FireClientside implements ClientModInitializer {
     private void initModules() {
         registerModule(new ArmorHudModule());
         registerModule(new PotionHudModule());
+        registerModule(new SprintDisplayModule());
         registerModule(new CoordinatesModule());
         registerModule(new ToggleToggleSneakModule());
         registerModule(new FPSDisplayModule());

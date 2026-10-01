@@ -28,14 +28,16 @@ import net.minecraft.text.Text;
 /**
  * Armor HUD (inspired by Inventory HUD+)
  *
- * Shows armor + held items with durability, stack counts and warnings.
- * Can be one unified bar, or every slot can be moved on its own (see {@link ArmorHudSlotModule}).
+ * Shows armor + held items with durability and stack counts.
+ * Can be one bar, or every slot can be moved on its own (see {@link ArmorHudSlotModule}).
  */
 public class ArmorHudModule extends ModuleBase {
 
     private static final Color color = Color.fromRGB(0x8FD3FF);
 
     private static final int ICON_SIZE = 16;
+    private static final int PADDING = 3;
+    private static final int SPACING = 2;
     private static final int TEXT_GAP = 3;
     private static final int BAR_HEIGHT = 2;
 
@@ -45,9 +47,6 @@ public class ArmorHudModule extends ModuleBase {
 
     @JsonOption(name = "orientation")
     private Orientation orientation = Orientation.HORIZONTAL;
-
-    @JsonOption(name = "spacing")
-    private int spacing = 2;
 
     // ---- slots ----
     @JsonOption(name = "show_helmet")
@@ -68,40 +67,24 @@ public class ArmorHudModule extends ModuleBase {
     @JsonOption(name = "show_off_hand")
     private boolean showOffHand = true;
 
-    @JsonOption(name = "show_empty")
-    private boolean showEmpty = false;
-
     // ---- durability ----
-    @JsonOption(name = "durability_text")
-    private DurabilityText durabilityText = DurabilityText.EXACT;
+    @JsonOption(name = "durability_style")
+    private DurabilityStyle durabilityStyle = DurabilityStyle.NUMBERS_AND_BAR;
 
-    @JsonOption(name = "show_bar")
-    private boolean showBar = true;
+    @JsonOption(name = "number_format")
+    private NumberFormat numberFormat = NumberFormat.EXACT;
 
-    @JsonOption(name = "bar_gradient")
-    private boolean barGradient = true;
-
-    @JsonOption(name = "hide_full_durability")
-    private boolean hideFullDurability = false;
+    @JsonOption(name = "number_position")
+    private NumberPosition numberPosition = NumberPosition.SIDE;
 
     @JsonOption(name = "low_warning")
     private boolean lowWarning = true;
 
-    @JsonOption(name = "low_flash")
-    private boolean lowFlash = true;
-
     @JsonOption(name = "low_percent")
     private int lowPercent = 10;
 
-    // ---- items ----
     @JsonOption(name = "show_stack_count")
     private boolean showStackCount = true;
-
-    @JsonOption(name = "count_inventory")
-    private boolean countInventory = false;
-
-    @JsonOption(name = "show_cooldown")
-    private boolean showCooldown = true;
 
     // ---- style ----
     @JsonOption(name = "show_background")
@@ -110,31 +93,26 @@ public class ArmorHudModule extends ModuleBase {
     @JsonOption(name = "show_border")
     private boolean showBorder = true;
 
-    @JsonOption(name = "cell_padding")
-    private int cellPadding = 3;
+    @JsonOption(name = "bg_opacity")
+    private int backgroundOpacity = 60;
 
-    @JsonOption(name = "color_background")
-    private String backgroundColor = "99000000";
+    @JsonOption(name = "bg_color")
+    private String backgroundColor = "000000";
 
-    @JsonOption(name = "color_border")
-    private String borderColor = "FF3C3C46";
+    @JsonOption(name = "border_color")
+    private String borderColor = "3C3C46";
 
-    @JsonOption(name = "color_text")
-    private String textColor = "FFFFFFFF";
+    @JsonOption(name = "text_color")
+    private String textColor = "FFFFFF";
 
-    @JsonOption(name = "color_warn")
-    private String warnColor = "FFFF5555";
-
-    @JsonOption(name = "color_bar")
-    private String barColor = "FF55FF55";
-
-    @JsonOption(name = "color_bar_background")
-    private String barBackgroundColor = "FF000000";
+    @JsonOption(name = "warn_color")
+    private String warnColor = "FF5555";
 
     private final ArrayList<ArmorHudSlotModule> slotModules = new ArrayList<>();
 
     public ArmorHudModule() {
-        super(new ModuleData("armor_hud", "\uD83D\uDEE1", color));
+        super(new ModuleData("armor_hud", "\uD83D\uDEE1", color,
+            "Armor HUD", "Shows your armor and held items with durability and stack counts. Use one bar, or move each slot on its own"));
 
         getData().setWidth(120);
         getData().setHeight(22);
@@ -144,7 +122,7 @@ public class ArmorHudModule extends ModuleBase {
 
         getData().setVisible(true);
 
-        // one draggable module per slot, only used in the independent layout
+        // one draggable module per slot, only used in the separate layout
         var index = 0;
         for(var slot : HudSlot.values()) {
             slotModules.add(new ArmorHudSlotModule(this, slot, index++));
@@ -193,8 +171,20 @@ public class ArmorHudModule extends ModuleBase {
         return getData().isVisible();
     }
 
+    private boolean showsNumbers() {
+        return durabilityStyle == DurabilityStyle.NUMBERS_AND_BAR || durabilityStyle == DurabilityStyle.NUMBERS;
+    }
+
+    private boolean showsBar() {
+        return durabilityStyle == DurabilityStyle.NUMBERS_AND_BAR || durabilityStyle == DurabilityStyle.BAR;
+    }
+
+    private static boolean hasDurability(ItemStack stack) {
+        return !stack.isEmpty() && stack.isDamageable() && stack.getMaxDamage() > 0;
+    }
+
     // ------------------------------------------------------------------
-    // shared drawing (used by the unified bar and the slot modules)
+    // shared drawing (used by the bar and the slot modules)
     // ------------------------------------------------------------------
 
     public record Entry(HudSlot slot, ItemStack stack, boolean sample) { }
@@ -223,15 +213,19 @@ public class ArmorHudModule extends ModuleBase {
             return new Entry(slot, stack, false);
         }
 
+        // so the slot can still be seen and moved in the editor
         if(editing) {
             return new Entry(slot, slot.getSample(), true);
         }
 
-        if(showEmpty) {
-            return new Entry(slot, ItemStack.EMPTY, false);
-        }
-
         return null;
+    }
+
+    private String numberText(int remaining, int max) {
+        return switch(numberFormat) {
+            case EXACT -> remaining + "/" + max;
+            case PERCENT -> Math.round((remaining / (double)max) * 100.0) + "%";
+        };
     }
 
     /**
@@ -241,22 +235,21 @@ public class ArmorHudModule extends ModuleBase {
         var text = MinecraftClient.getInstance().textRenderer;
         var stack = entry.stack();
 
-        var w = (cellPadding * 2) + ICON_SIZE;
-        var h = (cellPadding * 2) + ICON_SIZE + ((showBar) ? (BAR_HEIGHT + 1) : 0);
+        var durability = hasDurability(stack);
+        var numbers = durability && showsNumbers();
+        var bar = durability && showsBar();
 
-        if(!stack.isEmpty() && stack.isDamageable()) {
-            var max = stack.getMaxDamage();
+        var textWidth = (numbers) ? text.getWidth(numberText(stack.getMaxDamage(), stack.getMaxDamage())) : 0;
 
-            var widest = switch(durabilityText) {
-                case EXACT -> max + "/" + max;
-                case PERCENT -> "100%";
-                case OFF -> "";
-            };
+        if(numbers && numberPosition == NumberPosition.BELOW) {
+            var w = (PADDING * 2) + Math.max(ICON_SIZE, textWidth);
+            var h = (PADDING * 2) + ICON_SIZE + 1 + 9 + ((bar) ? (1 + BAR_HEIGHT) : 0);
 
-            if(!widest.isEmpty()) {
-                w += TEXT_GAP + text.getWidth(widest);
-            }
+            return new Size(w, h);
         }
+
+        var w = (PADDING * 2) + ICON_SIZE + ((numbers) ? (TEXT_GAP + textWidth) : 0);
+        var h = (PADDING * 2) + ICON_SIZE + ((bar) ? (1 + BAR_HEIGHT) : 0);
 
         return new Size(w, h);
     }
@@ -267,20 +260,26 @@ public class ArmorHudModule extends ModuleBase {
         var stack = entry.stack();
 
         HudUtil.drawBox(context, x, y, w, h,
-            showBackground, HudUtil.parseColor(backgroundColor, 0x99000000, false),
-            showBorder, HudUtil.parseColor(borderColor, 0xFF3C3C46, false));
+            showBackground, HudUtil.parseColorWithOpacity(backgroundColor, 0xFF000000, backgroundOpacity),
+            showBorder, HudUtil.parseColor(borderColor, 0xFF3C3C46));
 
         if(stack.isEmpty()) {
             return;
         }
 
-        var iconX = x + cellPadding;
-        var iconY = y + cellPadding;
+        var durability = hasDurability(stack);
+        var numbers = durability && showsNumbers();
+        var bar = durability && showsBar();
+        var below = (numberPosition == NumberPosition.BELOW);
+
+        // with the numbers under the item, the item is centered in the cell
+        var iconX = (numbers && below) ? (x + ((w - ICON_SIZE) / 2)) : (x + PADDING);
+        var iconY = y + PADDING;
 
         context.drawItem(stack, iconX, iconY);
 
         // item cooldown (ender pearls, shields, etc)
-        if(showCooldown && !entry.sample() && client.player != null) {
+        if(!entry.sample() && client.player != null) {
             var progress = client.player.getItemCooldownManager().getCooldownProgress(stack, tickProgress);
 
             if(progress > 0.0f) {
@@ -290,21 +289,12 @@ public class ArmorHudModule extends ModuleBase {
         }
 
         // stack size on held blocks / consumables
-        if(showStackCount && entry.slot().isHand() && stack.getMaxCount() > 1) {
-            var count = getDisplayCount(client, stack, entry.sample());
-
-            if(count > 1) {
-                var countText = String.valueOf(count);
-                context.drawText(text, countText, iconX + ICON_SIZE + 1 - text.getWidth(countText), iconY + 9, 0xFFFFFFFF, true);
-            }
+        if(showStackCount && entry.slot().isHand() && stack.getMaxCount() > 1 && stack.getCount() > 1) {
+            var countText = String.valueOf(stack.getCount());
+            context.drawText(text, countText, iconX + ICON_SIZE + 1 - text.getWidth(countText), iconY + 9, 0xFFFFFFFF, true);
         }
 
-        // durability
-        if(!stack.isDamageable() || stack.getMaxDamage() <= 0) {
-            return;
-        }
-
-        if(hideFullDurability && stack.getDamage() <= 0) {
+        if(!durability) {
             return;
         }
 
@@ -312,61 +302,38 @@ public class ArmorHudModule extends ModuleBase {
         var remaining = Math.max(0, max - stack.getDamage());
         var ratio = Math.min(1.0, remaining / (double)max);
 
-        var low = lowWarning && (ratio * 100.0) < lowPercent;
-        var showWarn = low && (!lowFlash || HudUtil.flashOn());
+        var warn = lowWarning && (ratio * 100.0) < lowPercent && HudUtil.flashOn();
+        var warningColor = HudUtil.parseColor(warnColor, 0xFFFF5555);
 
-        var normalColor = HudUtil.parseColor(textColor, 0xFFFFFFFF, true);
-        var warningColor = HudUtil.parseColor(warnColor, 0xFFFF5555, true);
+        if(numbers) {
+            var message = numberText(remaining, max);
+            var color = (warn) ? warningColor : HudUtil.parseColor(textColor, 0xFFFFFFFF);
 
-        var message = switch(durabilityText) {
-            case EXACT -> remaining + "/" + max;
-            case PERCENT -> Math.round(ratio * 100.0) + "%";
-            case OFF -> null;
-        };
-
-        if(message != null) {
-            context.drawText(text, message, iconX + ICON_SIZE + TEXT_GAP, iconY + 4, (showWarn) ? warningColor : normalColor, true);
+            if(below) {
+                context.drawText(text, message, x + ((w - text.getWidth(message)) / 2), iconY + ICON_SIZE + 1, color, true);
+            }
+            else {
+                context.drawText(text, message, iconX + ICON_SIZE + TEXT_GAP, iconY + 4, color, true);
+            }
         }
 
-        if(showBar) {
-            var barX = x + cellPadding;
-            var barWidth = w - (cellPadding * 2);
-            var barY = iconY + ICON_SIZE + 1;
+        // the bar always sits at the very bottom of the cell
+        if(bar) {
+            var barX = x + PADDING;
+            var barWidth = w - (PADDING * 2);
+            var barY = y + h - PADDING - BAR_HEIGHT;
 
-            context.fill(barX, barY, barX + barWidth, barY + BAR_HEIGHT, HudUtil.parseColor(barBackgroundColor, 0xFF000000, true));
+            context.fill(barX, barY, barX + barWidth, barY + BAR_HEIGHT, 0xFF000000);
 
             var filled = (int)Math.round(barWidth * ratio);
             if(filled > 0) {
-                var fillColor = (barGradient) ? (0xFF000000 | stack.getItemBarColor()) : HudUtil.parseColor(barColor, 0xFF55FF55, true);
-                context.fill(barX, barY, barX + filled, barY + BAR_HEIGHT, (showWarn) ? warningColor : fillColor);
+                context.fill(barX, barY, barX + filled, barY + BAR_HEIGHT, (warn) ? warningColor : (0xFF000000 | stack.getItemBarColor()));
             }
         }
-    }
-
-    private int getDisplayCount(MinecraftClient client, ItemStack stack, boolean sample) {
-        if(!countInventory || sample || client.player == null) {
-            return stack.getCount();
-        }
-
-        var player = client.player;
-        var total = 0;
-
-        for(var inventoryStack : player.getInventory().getMainStacks()) {
-            if(ItemStack.areItemsEqual(inventoryStack, stack)) {
-                total += inventoryStack.getCount();
-            }
-        }
-
-        var offHand = player.getOffHandStack();
-        if(ItemStack.areItemsEqual(offHand, stack)) {
-            total += offHand.getCount();
-        }
-
-        return total;
     }
 
     // ------------------------------------------------------------------
-    // unified bar
+    // bar layout
     // ------------------------------------------------------------------
 
     @Override
@@ -428,17 +395,17 @@ public class ArmorHudModule extends ModuleBase {
             drawCell(context, entries.get(i), x, y, w, h, tickProgress);
 
             if(horizontal) {
-                x += w + spacing;
+                x += w + SPACING;
             }
             else {
-                y += h + spacing;
+                y += h + SPACING;
             }
         }
 
         endTransform(context.getMatrices());
 
-        getData().setWidth((horizontal) ? (x - spacing) : maxWidth);
-        getData().setHeight((horizontal) ? maxHeight : (y - spacing));
+        getData().setWidth((horizontal) ? (x - SPACING) : maxWidth);
+        getData().setHeight((horizontal) ? maxHeight : (y - SPACING));
     }
 
     @Override
@@ -463,7 +430,7 @@ public class ArmorHudModule extends ModuleBase {
     public void moduleConfigPressed(ButtonWidget button) {
         var client = MinecraftClient.getInstance();
 
-        // every slot module is shown too, so slots can be dragged in the independent layout
+        // every slot module is shown too, so slots can be dragged in the separate layout
         var modules = new ArrayList<ModuleBase>(slotModules);
         modules.add(this);
 
@@ -478,48 +445,38 @@ public class ArmorHudModule extends ModuleBase {
 
         var ui = new HudUi(base, "armor_hud");
 
-        ui.header("section_layout")
-            .toggle("visible", getData()::isVisible, getData()::setVisible)
-            .cycle("layout", Layout.values(), () -> layout, (value) -> layout = value)
-            .cycle("orientation", Orientation.values(), () -> orientation, (value) -> orientation = value)
-            .slider("spacing", 0, 12, () -> spacing, (value) -> spacing = value)
-            .button("reset_positions", this::resetPositions)
+        ui.header("Layout")
+            .toggle("Visible", getData()::isVisible, getData()::setVisible)
+            .cycle("Layout", Layout.values(), () -> layout, (value) -> layout = value)
+            .cycle("Direction", Orientation.values(), () -> orientation, (value) -> orientation = value)
+            .button("Reset Positions", this::resetPositions)
 
-            .header("section_slots")
-            .toggle("helmet", () -> showHelmet, (value) -> showHelmet = value)
-            .toggle("chestplate", () -> showChestplate, (value) -> showChestplate = value)
-            .toggle("leggings", () -> showLeggings, (value) -> showLeggings = value)
-            .toggle("boots", () -> showBoots, (value) -> showBoots = value)
-            .toggle("main_hand", () -> showMainHand, (value) -> showMainHand = value)
-            .toggle("off_hand", () -> showOffHand, (value) -> showOffHand = value)
-            .toggle("show_empty", () -> showEmpty, (value) -> showEmpty = value)
+            .header("Show")
+            .toggle("Helmet", () -> showHelmet, (value) -> showHelmet = value)
+            .toggle("Chestplate", () -> showChestplate, (value) -> showChestplate = value)
+            .toggle("Leggings", () -> showLeggings, (value) -> showLeggings = value)
+            .toggle("Boots", () -> showBoots, (value) -> showBoots = value)
+            .toggle("Main Hand", () -> showMainHand, (value) -> showMainHand = value)
+            .toggle("Off Hand", () -> showOffHand, (value) -> showOffHand = value)
+            .toggle("Stack Count", () -> showStackCount, (value) -> showStackCount = value)
 
-            .header("section_durability")
-            .cycle("durability_text", DurabilityText.values(), () -> durabilityText, (value) -> durabilityText = value)
-            .toggle("show_bar", () -> showBar, (value) -> showBar = value)
-            .toggle("bar_gradient", () -> barGradient, (value) -> barGradient = value)
-            .toggle("hide_full_durability", () -> hideFullDurability, (value) -> hideFullDurability = value)
-            .toggle("low_warning", () -> lowWarning, (value) -> lowWarning = value)
-            .toggle("low_flash", () -> lowFlash, (value) -> lowFlash = value)
-            .slider("low_percent", 1, 50, () -> lowPercent, (value) -> lowPercent = value)
+            .header("Durability")
+            .cycle("Display", DurabilityStyle.values(), () -> durabilityStyle, (value) -> durabilityStyle = value)
+            .cycle("Numbers", NumberFormat.values(), () -> numberFormat, (value) -> numberFormat = value)
+            .cycle("Numbers Position", NumberPosition.values(), () -> numberPosition, (value) -> numberPosition = value)
+            .toggle("Low Warning", () -> lowWarning, (value) -> lowWarning = value)
+            .slider("Warn Below", 1, 50, "%", () -> lowPercent, (value) -> lowPercent = value)
 
-            .header("section_items")
-            .toggle("show_stack_count", () -> showStackCount, (value) -> showStackCount = value)
-            .toggle("count_inventory", () -> countInventory, (value) -> countInventory = value)
-            .toggle("show_cooldown", () -> showCooldown, (value) -> showCooldown = value)
+            .header("Style")
+            .toggle("Background", () -> showBackground, (value) -> showBackground = value)
+            .toggle("Border", () -> showBorder, (value) -> showBorder = value)
+            .slider("Opacity", 0, 100, "%", () -> backgroundOpacity, (value) -> backgroundOpacity = value)
 
-            .header("section_style")
-            .toggle("show_background", () -> showBackground, (value) -> showBackground = value)
-            .toggle("show_border", () -> showBorder, (value) -> showBorder = value)
-            .slider("cell_padding", 0, 8, () -> cellPadding, (value) -> cellPadding = value)
-
-            .header("section_colors")
-            .color("color_background", () -> backgroundColor, (value) -> backgroundColor = value, 0x99000000)
-            .color("color_border", () -> borderColor, (value) -> borderColor = value, 0xFF3C3C46)
-            .color("color_text", () -> textColor, (value) -> textColor = value, 0xFFFFFFFF)
-            .color("color_warn", () -> warnColor, (value) -> warnColor = value, 0xFFFF5555)
-            .color("color_bar", () -> barColor, (value) -> barColor = value, 0xFF55FF55)
-            .color("color_bar_background", () -> barBackgroundColor, (value) -> barBackgroundColor = value, 0xFF000000);
+            .header("Colors (hex)")
+            .color("Background", () -> backgroundColor, (value) -> backgroundColor = value)
+            .color("Border", () -> borderColor, (value) -> borderColor = value)
+            .color("Text", () -> textColor, (value) -> textColor = value)
+            .color("Warning", () -> warnColor, (value) -> warnColor = value);
 
         widgets.add(ui.build());
         return widgets;
@@ -544,19 +501,85 @@ public class ArmorHudModule extends ModuleBase {
         FireClientside.saveConfig();
     }
 
-    public enum Layout {
-        UNIFIED,
-        INDEPENDENT
+    public enum Layout implements HudUi.Labeled {
+        UNIFIED("One Bar"),
+        INDEPENDENT("Separate");
+
+        private final String label;
+
+        Layout(String label) {
+            this.label = label;
+        }
+
+        @Override
+        public String label() {
+            return label;
+        }
     }
 
-    public enum Orientation {
-        HORIZONTAL,
-        VERTICAL
+    public enum Orientation implements HudUi.Labeled {
+        HORIZONTAL("Horizontal"),
+        VERTICAL("Vertical");
+
+        private final String label;
+
+        Orientation(String label) {
+            this.label = label;
+        }
+
+        @Override
+        public String label() {
+            return label;
+        }
     }
 
-    public enum DurabilityText {
-        EXACT,
-        PERCENT,
-        OFF
+    public enum DurabilityStyle implements HudUi.Labeled {
+        NUMBERS_AND_BAR("Numbers + Bar"),
+        NUMBERS("Numbers Only"),
+        BAR("Bar Only"),
+        HIDDEN("Hidden");
+
+        private final String label;
+
+        DurabilityStyle(String label) {
+            this.label = label;
+        }
+
+        @Override
+        public String label() {
+            return label;
+        }
+    }
+
+    public enum NumberFormat implements HudUi.Labeled {
+        EXACT("245/435"),
+        PERCENT("56%");
+
+        private final String label;
+
+        NumberFormat(String label) {
+            this.label = label;
+        }
+
+        @Override
+        public String label() {
+            return label;
+        }
+    }
+
+    public enum NumberPosition implements HudUi.Labeled {
+        SIDE("Side"),
+        BELOW("Below");
+
+        private final String label;
+
+        NumberPosition(String label) {
+            this.label = label;
+        }
+
+        @Override
+        public String label() {
+            return label;
+        }
     }
 }

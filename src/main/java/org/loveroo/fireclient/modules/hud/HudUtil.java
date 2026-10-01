@@ -18,23 +18,26 @@ public final class HudUtil {
     private HudUtil() { }
 
     /**
-     * Parses an AARRGGBB (or RRGGBB) hex string.
-     * @param forceOpaque Forces alpha to 255 (used for text, which is invisible with alpha 0 on newer versions)
+     * Parses a 6 digit RRGGBB hex string into an opaque ARGB color
      */
-    public static int parseColor(String hex, int fallback, boolean forceOpaque) {
+    public static int parseColor(String hex, int fallback) {
         try {
-            var text = hex.trim();
-            var value = (int)Long.parseLong(text, 16);
-
-            if(text.length() <= 6) {
-                value |= 0xFF000000;
-            }
-
-            return (forceOpaque) ? (value | 0xFF000000) : value;
+            var value = Integer.parseInt(hex.trim(), 16);
+            return 0xFF000000 | (value & 0xFFFFFF);
         }
         catch(Exception e) {
             return fallback;
         }
+    }
+
+    /**
+     * Same as {@link #parseColor(String, int)} but with an opacity from 0 to 100
+     */
+    public static int parseColorWithOpacity(String hex, int fallback, int opacityPercent) {
+        var rgb = parseColor(hex, fallback) & 0xFFFFFF;
+        var alpha = (int)Math.round(Math.clamp(opacityPercent, 0, 100) * 2.55);
+
+        return (alpha << 24) | rgb;
     }
 
     /**

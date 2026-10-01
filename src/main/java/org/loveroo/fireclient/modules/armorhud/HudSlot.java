@@ -9,22 +9,28 @@ import net.minecraft.item.Items;
  */
 public enum HudSlot {
 
-    HELMET("helmet", false),
-    CHESTPLATE("chestplate", false),
-    LEGGINGS("leggings", false),
-    BOOTS("boots", false),
-    MAIN_HAND("main_hand", true),
-    OFF_HAND("off_hand", true);
+    HELMET("helmet", "Helmet", false),
+    CHESTPLATE("chestplate", "Chestplate", false),
+    LEGGINGS("leggings", "Leggings", false),
+    BOOTS("boots", "Boots", false),
+    MAIN_HAND("main_hand", "Main Hand", true),
+    OFF_HAND("off_hand", "Off Hand", true);
 
     private final String id;
+    private final String label;
     private final boolean hand;
 
     // lazily created so we never touch item registries before they exist
     private ItemStack sample = null;
 
-    HudSlot(String id, boolean hand) {
+    HudSlot(String id, String label, boolean hand) {
         this.id = id;
+        this.label = label;
         this.hand = hand;
+    }
+
+    public String getLabel() {
+        return label;
     }
 
     public String getId() {

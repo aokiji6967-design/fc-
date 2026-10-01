@@ -28,7 +28,8 @@ public class ArmorHudSlotModule extends ModuleBase {
     private final HudSlot slot;
 
     public ArmorHudSlotModule(ArmorHudModule parent, HudSlot slot, int index) {
-        super(new ModuleData("armor_hud_" + slot.getId(), "\uD83D\uDEE1", color));
+        super(new ModuleData("armor_hud_" + slot.getId(), "\uD83D\uDEE1", color,
+            "Armor HUD: " + slot.getLabel(), "The " + slot.getLabel().toLowerCase() + " slot of the Armor HUD (separate layout)"));
 
         this.parent = parent;
         this.slot = slot;

@@ -37,9 +37,7 @@ public class ArmorHudModule extends ModuleBase {
 
     private static final int ICON_SIZE = 16;
     private static final int PADDING = 3;
-    private static final int SPACING = 2;
     private static final int TEXT_GAP = 3;
-    private static final int BAR_HEIGHT = 2;
 
     // ---- layout ----
     @JsonOption(name = "layout")
@@ -92,6 +90,24 @@ public class ArmorHudModule extends ModuleBase {
 
     @JsonOption(name = "show_border")
     private boolean showBorder = true;
+
+    @JsonOption(name = "show_shadow")
+    private boolean showShadow = true;
+
+    @JsonOption(name = "accent")
+    private boolean accent = true;
+
+    @JsonOption(name = "accent_color")
+    private String accentColor = "8FD3FF";
+
+    @JsonOption(name = "bar_style")
+    private BarStyle barStyle = BarStyle.GRADIENT;
+
+    @JsonOption(name = "bar_height")
+    private int barHeight = 2;
+
+    @JsonOption(name = "spacing")
+    private int spacing = 2;
 
     @JsonOption(name = "bg_opacity")
     private int backgroundOpacity = 60;
@@ -243,13 +259,13 @@ public class ArmorHudModule extends ModuleBase {
 
         if(numbers && numberPosition == NumberPosition.BELOW) {
             var w = (PADDING * 2) + Math.max(ICON_SIZE, textWidth);
-            var h = (PADDING * 2) + ICON_SIZE + 1 + 9 + ((bar) ? (1 + BAR_HEIGHT) : 0);
+            var h = (PADDING * 2) + ICON_SIZE + 1 + 9 + ((bar) ? (1 + barHeight) : 0);
 
             return new Size(w, h);
         }
 
         var w = (PADDING * 2) + ICON_SIZE + ((numbers) ? (TEXT_GAP + textWidth) : 0);
-        var h = (PADDING * 2) + ICON_SIZE + ((bar) ? (1 + BAR_HEIGHT) : 0);
+        var h = (PADDING * 2) + ICON_SIZE + ((bar) ? (1 + barHeight) : 0);
 
         return new Size(w, h);
     }
@@ -259,11 +275,11 @@ public class ArmorHudModule extends ModuleBase {
         var text = client.textRenderer;
         var stack = entry.stack();
 
-        HudUtil.drawBox(context, x, y, w, h,
-            showBackground, HudUtil.parseColorWithOpacity(backgroundColor, 0xFF000000, backgroundOpacity),
-            showBorder, HudUtil.parseColor(borderColor, 0xFF3C3C46));
+        var panelBackground = HudUtil.parseColorWithOpacity(backgroundColor, 0xFF000000, backgroundOpacity);
+        var panelBorder = HudUtil.parseColor(borderColor, 0xFF3C3C46);
 
         if(stack.isEmpty()) {
+            HudUtil.drawPanel(context, x, y, w, h, showBackground, panelBackground, showBorder, panelBorder, showShadow, 0);
             return;
         }
 
@@ -271,6 +287,21 @@ public class ArmorHudModule extends ModuleBase {
         var numbers = durability && showsNumbers();
         var bar = durability && showsBar();
         var below = (numberPosition == NumberPosition.BELOW);
+
+        var max = stack.getMaxDamage();
+        var remaining = durability ? Math.max(0, max - stack.getDamage()) : 0;
+        var ratio = durability ? Math.min(1.0, remaining / (double)max) : 1.0;
+
+        var warn = durability && lowWarning && (ratio * 100.0) < lowPercent && HudUtil.flashOn();
+        var warningColor = HudUtil.parseColor(warnColor, 0xFFFF5555);
+
+        // the accent stripe is colored by durability, so a glance is enough to spot a broken piece
+        var accentStripe = 0;
+        if(accent) {
+            accentStripe = (warn) ? warningColor : (durability ? HudUtil.durabilityColor((float)ratio) : HudUtil.parseColor(accentColor, 0xFF8FD3FF));
+        }
+
+        HudUtil.drawPanel(context, x, y, w, h, showBackground, panelBackground, showBorder, panelBorder, showShadow, accentStripe);
 
         // with the numbers under the item, the item is centered in the cell
         var iconX = (numbers && below) ? (x + ((w - ICON_SIZE) / 2)) : (x + PADDING);
@@ -298,13 +329,6 @@ public class ArmorHudModule extends ModuleBase {
             return;
         }
 
-        var max = stack.getMaxDamage();
-        var remaining = Math.max(0, max - stack.getDamage());
-        var ratio = Math.min(1.0, remaining / (double)max);
-
-        var warn = lowWarning && (ratio * 100.0) < lowPercent && HudUtil.flashOn();
-        var warningColor = HudUtil.parseColor(warnColor, 0xFFFF5555);
-
         if(numbers) {
             var message = numberText(remaining, max);
             var color = (warn) ? warningColor : HudUtil.parseColor(textColor, 0xFFFFFFFF);
@@ -321,14 +345,14 @@ public class ArmorHudModule extends ModuleBase {
         if(bar) {
             var barX = x + PADDING;
             var barWidth = w - (PADDING * 2);
-            var barY = y + h - PADDING - BAR_HEIGHT;
+            var barY = y + h - PADDING - barHeight;
 
-            context.fill(barX, barY, barX + barWidth, barY + BAR_HEIGHT, 0xFF000000);
-
-            var filled = (int)Math.round(barWidth * ratio);
-            if(filled > 0) {
-                context.fill(barX, barY, barX + filled, barY + BAR_HEIGHT, (warn) ? warningColor : (0xFF000000 | stack.getItemBarColor()));
+            var fill = (barStyle == BarStyle.GRADIENT) ? HudUtil.durabilityColor((float)ratio) : (0xFF000000 | stack.getItemBarColor());
+            if(warn) {
+                fill = warningColor;
             }
+
+            HudUtil.drawBar(context, barX, barY, barWidth, barHeight, (float)ratio, fill);
         }
     }
 
@@ -395,17 +419,17 @@ public class ArmorHudModule extends ModuleBase {
             drawCell(context, entries.get(i), x, y, w, h, tickProgress);
 
             if(horizontal) {
-                x += w + SPACING;
+                x += w + spacing;
             }
             else {
-                y += h + SPACING;
+                y += h + spacing;
             }
         }
 
         endTransform(context.getMatrices());
 
-        getData().setWidth((horizontal) ? (x - SPACING) : maxWidth);
-        getData().setHeight((horizontal) ? maxHeight : (y - SPACING));
+        getData().setWidth((horizontal) ? (x - spacing) : maxWidth);
+        getData().setHeight((horizontal) ? maxHeight : (y - spacing));
     }
 
     @Override
@@ -470,13 +494,21 @@ public class ArmorHudModule extends ModuleBase {
             .header("Style")
             .toggle("Background", () -> showBackground, (value) -> showBackground = value)
             .toggle("Border", () -> showBorder, (value) -> showBorder = value)
+            .toggle("Drop Shadow", () -> showShadow, (value) -> showShadow = value)
+            .toggle("Accent Stripe", () -> accent, (value) -> accent = value)
             .slider("Opacity", 0, 100, "%", () -> backgroundOpacity, (value) -> backgroundOpacity = value)
+            .slider("Spacing", 0, 8, "px", () -> spacing, (value) -> spacing = value)
+
+            .header("Durability Bar")
+            .cycle("Bar Color", BarStyle.values(), () -> barStyle, (value) -> barStyle = value)
+            .slider("Bar Height", 1, 5, "px", () -> barHeight, (value) -> barHeight = value)
 
             .header("Colors (hex)")
             .color("Background", () -> backgroundColor, (value) -> backgroundColor = value)
             .color("Border", () -> borderColor, (value) -> borderColor = value)
             .color("Text", () -> textColor, (value) -> textColor = value)
-            .color("Warning", () -> warnColor, (value) -> warnColor = value);
+            .color("Warning", () -> warnColor, (value) -> warnColor = value)
+            .color("Accent", () -> accentColor, (value) -> accentColor = value);
 
         widgets.add(ui.build());
         return widgets;
@@ -558,6 +590,22 @@ public class ArmorHudModule extends ModuleBase {
         private final String label;
 
         NumberFormat(String label) {
+            this.label = label;
+        }
+
+        @Override
+        public String label() {
+            return label;
+        }
+    }
+
+    public enum BarStyle implements HudUi.Labeled {
+        GRADIENT("Durability"),
+        ITEM("Item Color");
+
+        private final String label;
+
+        BarStyle(String label) {
             this.label = label;
         }
 

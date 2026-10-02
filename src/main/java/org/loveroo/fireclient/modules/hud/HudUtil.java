@@ -41,6 +41,168 @@ public final class HudUtil {
     }
 
     /**
+     * Replaces the alpha of an ARGB color (0 to 255)
+     */
+    public static int withAlpha(int color, int alpha) {
+        return (Math.clamp(alpha, 0, 255) << 24) | (color & 0xFFFFFF);
+    }
+
+    /**
+     * Replaces the alpha of an ARGB color using a percentage (0 to 100)
+     */
+    public static int withOpacity(int color, int opacityPercent) {
+        return withAlpha(color, (int)Math.round(Math.clamp(opacityPercent, 0, 100) * 2.55));
+    }
+
+    /**
+     * Smoothly blends between two ARGB colors. Amount runs from 0.0 (from) to 1.0 (to)
+     */
+    public static int lerpColor(int from, int to, float amount) {
+        var t = Math.clamp(amount, 0.0f, 1.0f);
+
+        var a = lerpPoint((from >>> 24) & 0xFF, (to >>> 24) & 0xFF, t);
+        var r = lerpPoint((from >>> 16) & 0xFF, (to >>> 16) & 0xFF, t);
+        var g = lerpPoint((from >>> 8) & 0xFF, (to >>> 8) & 0xFF, t);
+        var b = lerpPoint(from & 0xFF, to & 0xFF, t);
+
+        return (a << 24) | (r << 16) | (g << 8) | b;
+    }
+
+    private static int lerpPoint(int from, int to, float t) {
+        return Math.round(from + (to - from) * t);
+    }
+
+    /**
+     * Mixes a color towards white, keeping the original alpha
+     */
+    public static int lighten(int color, float amount) {
+        return lerpColor(color, withAlpha(0xFFFFFF, (color >>> 24) & 0xFF), amount);
+    }
+
+    /**
+     * Mixes a color towards black, keeping the original alpha
+     */
+    public static int darken(int color, float amount) {
+        return lerpColor(color, withAlpha(0x000000, (color >>> 24) & 0xFF), amount);
+    }
+
+    /**
+     * Green -> yellow -> red color that describes a durability ratio (0.0 to 1.0)
+     */
+    public static int durabilityColor(float ratio) {
+        var t = Math.clamp(ratio, 0.0f, 1.0f);
+
+        if(t >= 0.5f) {
+            return lerpColor(0xFFF2B33C, 0xFF48D96B, (t - 0.5f) * 2.0f);
+        }
+
+        return lerpColor(0xFFE14B4B, 0xFFF2B33C, t * 2.0f);
+    }
+
+    /**
+     * Green -> yellow -> red color for a ping in milliseconds
+     */
+    public static int pingColor(int ping) {
+        if(ping < 0) {
+            return 0xFF9E9E9E;
+        }
+
+        if(ping < 100) {
+            return lerpColor(0xFF48D96B, 0xFFF2B33C, ping / 100.0f);
+        }
+
+        if(ping < 300) {
+            return lerpColor(0xFFF2B33C, 0xFFE14B4B, (ping - 100) / 200.0f);
+        }
+
+        return 0xFFE14B4B;
+    }
+
+    /**
+     * Horizontal gradient fill, one column at a time
+     */
+    public static void drawHorizontalGradient(net.minecraft.client.gui.DrawContext context, int x, int y, int w, int h, int from, int to) {
+        if(w <= 0 || h <= 0) {
+            return;
+        }
+
+        if(w == 1) {
+            context.fill(x, y, x + 1, y + h, from);
+            return;
+        }
+
+        for(var column = 0; column < w; column++) {
+            context.fill(x + column, y, x + column + 1, y + h, lerpColor(from, to, (float)column / (w - 1)));
+        }
+    }
+
+    /**
+     * Vertical gradient fill, one row at a time
+     */
+    public static void drawVerticalGradient(net.minecraft.client.gui.DrawContext context, int x, int y, int w, int h, int from, int to) {
+        if(w <= 0 || h <= 0) {
+            return;
+        }
+
+        if(h == 1) {
+            context.fill(x, y, x + w, y + 1, from);
+            return;
+        }
+
+        for(var row = 0; row < h; row++) {
+            context.fill(x, y + row, x + w, y + row + 1, lerpColor(from, to, (float)row / (h - 1)));
+        }
+    }
+
+    /**
+     * A card / panel used by the HUD modules.
+     *
+     * Draws an optional drop shadow, a soft vertical gradient background with a
+     * subtle top highlight, a border and an optional accent stripe on the left.
+     * An accent color with a zero alpha is treated as "no accent".
+     */
+    public static void drawPanel(net.minecraft.client.gui.DrawContext context, int x, int y, int w, int h,
+            boolean background, int backgroundColor,
+            boolean border, int borderColor,
+            boolean shadow, int accentColor) {
+        if(shadow) {
+            context.fill(x + 1, y + 2, x + w + 1, y + h + 2, 0x40000000);
+        }
+
+        if(background) {
+            drawVerticalGradient(context, x, y, w, h, lighten(backgroundColor, 0.12f), darken(backgroundColor, 0.10f));
+            context.fill(x, y, x + w, y + 1, 0x1AFFFFFF);
+        }
+
+        if(border) {
+            drawBorder(context, x, y, w, h, borderColor);
+        }
+
+        if(((accentColor >>> 24) & 0xFF) > 0) {
+            drawVerticalGradient(context, x, y, 2, h, lighten(accentColor, 0.25f), darken(accentColor, 0.15f));
+        }
+    }
+
+    /**
+     * A slim progress bar with a dark track, a gradient fill and a top highlight.
+     * Used for durability and status effect timers.
+     */
+    public static void drawBar(net.minecraft.client.gui.DrawContext context, int x, int y, int w, int h, float ratio, int color) {
+        context.fill(x, y, x + w, y + h, 0xB0101014);
+
+        var filled = Math.round(w * Math.clamp(ratio, 0.0f, 1.0f));
+        if(filled <= 0) {
+            return;
+        }
+
+        drawHorizontalGradient(context, x, y, filled, h, darken(color, 0.10f), lighten(color, 0.35f));
+
+        if(h > 1) {
+            context.fill(x, y, x + filled, y + 1, 0x33FFFFFF);
+        }
+    }
+
+    /**
      * True while one of the FireClient HUD editor screens is open
      */
     public static boolean isEditing() {

@@ -42,6 +42,7 @@ public class PotionHudModule extends ModuleBase {
 
     private static final int PADDING = 3;
     private static final int SPACING = 2;
+    private static final int BAR_HEIGHT = 2;
 
     // ---- display ----
     @JsonOption(name = "mode")
@@ -82,6 +83,18 @@ public class PotionHudModule extends ModuleBase {
 
     @JsonOption(name = "show_border")
     private boolean showBorder = false;
+
+    @JsonOption(name = "show_shadow")
+    private boolean showShadow = true;
+
+    @JsonOption(name = "category_accent")
+    private boolean categoryAccent = true;
+
+    @JsonOption(name = "show_time_bar")
+    private boolean showTimeBar = true;
+
+    @JsonOption(name = "time_bar_scope")
+    private int timeBarScope = 180;
 
     @JsonOption(name = "bg_opacity")
     private int backgroundOpacity = 60;
@@ -205,6 +218,10 @@ public class PotionHudModule extends ModuleBase {
         return isExpiring(entry) && HudUtil.flashOn();
     }
 
+    private int barExtra(Entry entry) {
+        return (showTimeBar && showDuration && !entry.infinite() && entry.duration() > 0) ? (1 + BAR_HEIGHT) : 0;
+    }
+
     private Cell buildCell(Entry entry) {
         var text = MinecraftClient.getInstance().textRenderer;
 
@@ -215,7 +232,7 @@ public class PotionHudModule extends ModuleBase {
             var durationWidth = (duration.isEmpty()) ? 0 : (int)Math.ceil(text.getWidth(duration) * SMALL_TEXT);
 
             var w = (PADDING * 2) + Math.max(ICON_SIZE, durationWidth);
-            var h = (PADDING * 2) + ICON_SIZE + ((duration.isEmpty()) ? 0 : 1 + (int)Math.ceil(8 * SMALL_TEXT));
+            var h = (PADDING * 2) + ICON_SIZE + ((duration.isEmpty()) ? 0 : 1 + (int)Math.ceil(8 * SMALL_TEXT)) + barExtra(entry);
 
             return new Cell(entry, "", (showLevel) ? level : null, duration, w, h);
         }
@@ -240,7 +257,7 @@ public class PotionHudModule extends ModuleBase {
         var textWidth = Math.max(text.getWidth(titleText), text.getWidth(duration));
 
         var w = (PADDING * 2) + ICON_SIZE + ((textWidth > 0) ? TEXT_GAP : 0) + textWidth;
-        var h = (PADDING * 2) + Math.max(ICON_SIZE, textHeight);
+        var h = (PADDING * 2) + Math.max(ICON_SIZE, textHeight) + barExtra(entry);
 
         return new Cell(entry, titleText, level, duration, w, h);
     }
@@ -315,17 +332,31 @@ public class PotionHudModule extends ModuleBase {
         getData().setHeight((horizontal) ? maxHeight : (y - SPACING));
     }
 
+    private int categoryColor(Entry entry) {
+        return switch(entry.type().value().getCategory()) {
+            case BENEFICIAL -> 0xFF48D96B;
+            case HARMFUL -> 0xFFE14B4B;
+            default -> 0xFFF2B33C;
+        };
+    }
+
     private void drawCell(DrawContext context, Cell cell, int x, int y, int w, int h) {
         var text = MinecraftClient.getInstance().textRenderer;
         var entry = cell.entry();
 
-        HudUtil.drawBox(context, x, y, w, h,
-            showBackground, HudUtil.parseColorWithOpacity(backgroundColor, 0xFF000000, backgroundOpacity),
-            showBorder, HudUtil.parseColor(borderColor, 0xFF3C3C46));
-
         var warn = warnActive(entry);
         var normalColor = HudUtil.parseColor(textColor, 0xFFFFFFFF);
         var warningColor = HudUtil.parseColor(warnColor, 0xFFFF5555);
+
+        var accent = (categoryAccent) ? categoryColor(entry) : 0;
+        if(warn) {
+            accent = warningColor;
+        }
+
+        HudUtil.drawPanel(context, x, y, w, h,
+            showBackground, HudUtil.parseColorWithOpacity(backgroundColor, 0xFF000000, backgroundOpacity),
+            showBorder, HudUtil.parseColor(borderColor, 0xFF3C3C46),
+            showShadow, accent);
 
         var titleColor = (warn) ? warningColor : normalColor;
         var durationColor = titleColor;
@@ -345,6 +376,8 @@ public class PotionHudModule extends ModuleBase {
                 var durationWidth = text.getWidth(cell.duration()) * SMALL_TEXT;
                 HudUtil.drawScaledText(context, text, cell.duration(), x + ((w - (float)durationWidth) / 2.0f), iconY + ICON_SIZE + 1, SMALL_TEXT, durationColor);
             }
+
+            drawTimeBar(context, entry, x, y, w, h, warn, warningColor, textColor);
 
             return;
         }
@@ -372,6 +405,24 @@ public class PotionHudModule extends ModuleBase {
         if(hasDuration) {
             context.drawText(text, cell.duration(), textX, textY, durationColor, true);
         }
+
+        drawTimeBar(context, entry, x, y, w, h, warn, warningColor, textColor);
+    }
+
+    /**
+     * A slim bar at the bottom of the cell that drains as the effect runs out.
+     */
+    private void drawTimeBar(DrawContext context, Entry entry, int x, int y, int w, int h, boolean warn, int warningColor, String normalTextColor) {
+        if(!showTimeBar || entry.infinite() || entry.duration() <= 0) {
+            return;
+        }
+
+        var scopeTicks = Math.max(1, timeBarScope * 20);
+        var ratio = Math.min(1.0f, entry.duration() / (float)scopeTicks);
+
+        var barColor = (warn) ? warningColor : ((categoryAccent) ? categoryColor(entry) : HudUtil.parseColor(normalTextColor, 0xFFFFFFFF));
+
+        HudUtil.drawBar(context, x + PADDING, y + h - PADDING - BAR_HEIGHT, w - (PADDING * 2), BAR_HEIGHT, ratio, barColor);
     }
 
     private void drawIcon(DrawContext context, Entry entry, int x, int y) {
@@ -421,7 +472,11 @@ public class PotionHudModule extends ModuleBase {
             .header("Style")
             .toggle("Background", () -> showBackground, (value) -> showBackground = value)
             .toggle("Border", () -> showBorder, (value) -> showBorder = value)
+            .toggle("Drop Shadow", () -> showShadow, (value) -> showShadow = value)
+            .toggle("Category Accent", () -> categoryAccent, (value) -> categoryAccent = value)
+            .toggle("Time Left Bar", () -> showTimeBar, (value) -> showTimeBar = value)
             .slider("Opacity", 0, 100, "%", () -> backgroundOpacity, (value) -> backgroundOpacity = value)
+            .slider("Bar Scope", 15, 600, "s", () -> timeBarScope, (value) -> timeBarScope = value)
 
             .header("Colors (hex)")
             .color("Background", () -> backgroundColor, (value) -> backgroundColor = value)

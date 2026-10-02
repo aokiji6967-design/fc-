@@ -46,6 +46,7 @@ import org.loveroo.fireclient.modules.ParticlesModule;
 import org.loveroo.fireclient.modules.PotionHudModule;
 import org.loveroo.fireclient.modules.SprintDisplayModule;
 import org.loveroo.fireclient.modules.PerspectiveModule;
+import org.loveroo.fireclient.modules.PingDisplayModule;
 import org.loveroo.fireclient.modules.ReachDisplayModule;
 import org.loveroo.fireclient.modules.SaturationDisplayModule;
 import org.loveroo.fireclient.modules.ShadowModule;
@@ -120,6 +121,7 @@ public class FireClientside implements ClientModInitializer {
         registerModule(new CoordinatesModule());
         registerModule(new ToggleToggleSneakModule());
         registerModule(new FPSDisplayModule());
+        registerModule(new PingDisplayModule());
         registerModule(new CoordsChatModule());
         registerModule(new NametagModule());
         registerModule(new AutoMessageModule());

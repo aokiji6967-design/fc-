@@ -88,6 +88,8 @@
     "settings.HazeliNametagMixin",
     "settings.HazeliPlayerModelMixin",
     "settings.HideItemNameMixin",
+    "settings.MeasurePingMixin",
+    "settings.MeasurePingMixin$MeasurePingResponseMixin",
     "settings.PreventHittingDeadEntitiesMixin",
     "settings.PreventUnlistingMixin",
     "settings.PreventUntoggleKeysMixin",

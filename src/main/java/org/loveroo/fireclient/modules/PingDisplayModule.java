@@ -3,6 +3,7 @@ package org.loveroo.fireclient.modules;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.loveroo.fireclient.data.LivePing;
 import org.loveroo.fireclient.RooHelper;
 import org.loveroo.fireclient.client.FireClientside;
 import org.loveroo.fireclient.data.Color;
@@ -106,20 +107,29 @@ public class PingDisplayModule extends ModuleBase {
     }
 
     /**
-     * The raw latency of our own player list entry, or -1 when there is none
-     * (not connected, or the server has not reported a value yet).
+     * Current ping in milliseconds, or -1 when there is nothing to show.
+     *
+     * This deliberately does NOT read PlayerListEntry.getLatency(). That value is a
+     * cached copy of whatever the server reported in the player list packet during
+     * join, which is why it can sit at 1ms while the real connection is far slower.
+     *
+     * LivePing measures the actual round trip of the client/server ping exchange
+     * instead, so the number reflects the connection the player is really on.
      */
     private int readPing(MinecraftClient client) {
-        if(client.player == null || client.getNetworkHandler() == null) {
-            return -1;
+        var ping = LivePing.get();
+
+        // before the first ping response arrives, fall back to the cached value so
+        // the HUD shows something instead of a dash for the first second or so
+        if(ping < 0 && client.player != null && client.getNetworkHandler() != null) {
+            var entry = client.getNetworkHandler().getPlayerListEntry(client.player.getUuid());
+
+            if(entry != null) {
+                return entry.getLatency();
+            }
         }
 
-        var entry = client.getNetworkHandler().getPlayerListEntry(client.player.getUuid());
-        if(entry == null) {
-            return -1;
-        }
-
-        return entry.getLatency();
+        return ping;
     }
 
     /**

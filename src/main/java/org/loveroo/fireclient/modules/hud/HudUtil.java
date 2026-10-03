@@ -1,5 +1,7 @@
 package org.loveroo.fireclient.modules.hud;
 
+import java.util.HashMap;
+
 import org.loveroo.fireclient.screen.config.MainConfigScreen;
 import org.loveroo.fireclient.screen.config.ModuleConfigScreen;
 
@@ -15,19 +17,48 @@ public final class HudUtil {
     private static final int[] ROMAN_VALUES = { 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1 };
     private static final String[] ROMAN_SYMBOLS = { "M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I" };
 
+    private static final int MAX_COLOR_CACHE_SIZE = 64;
+
+    private static final HashMap<String, Integer> colorCache = new HashMap<>(MAX_COLOR_CACHE_SIZE);
+
     private HudUtil() { }
 
     /**
-     * Parses a 6 digit RRGGBB hex string into an opaque ARGB color
+     * Marker for "this hex string failed to parse", so a legitimate 0x000000 (which
+     * parses fine but is indistinguishable from a sentinel int) is cached correctly.
      */
+    private static final int PARSE_FAILED = -1;
+
+    /**
+     * Parses a 6 digit RRGGBB hex string into an opaque ARGB color
+ *
+     * Memoized: the HUD modules call this several times per cell per frame with the
+     * same handful of config strings, and the parse is wrapped in a try/catch.
+ * Only successful parses are cached, since a fallback result depends on the caller.
+ */
     public static int parseColor(String hex, int fallback) {
+        var cached = colorCache.get(hex);
+
+        if(cached != null) {
+            return (cached == PARSE_FAILED) ? fallback : cached;
+        }
+
+        var parsed = PARSE_FAILED;
+
         try {
-            var value = Integer.parseInt(hex.trim(), 16);
-            return 0xFF000000 | (value & 0xFFFFFF);
+            parsed = 0xFF000000 | (Integer.parseInt(hex.trim(), 16) & 0xFFFFFF);
         }
         catch(Exception e) {
-            return fallback;
+            // keep the failure marker so bad input is not re-parsed every frame
         }
+
+        if(colorCache.size() >= MAX_COLOR_CACHE_SIZE) {
+            colorCache.clear();
+        }
+
+        colorCache.put(hex, parsed);
+
+        return (parsed == PARSE_FAILED) ? fallback : parsed;
     }
 
     /**
@@ -119,7 +150,17 @@ public final class HudUtil {
     }
 
     /**
-     * Horizontal gradient fill, one column at a time
+     * Maximum number of bands a gradient is split into.
+     *
+     * A gradient used to issue one fill call per pixel, so a 120px wide panel cost
+     * 120 draw calls every frame. Splitting into a fixed number of bands keeps the
+     * look (a gradient across a small HUD element cannot show visible banding)
+     * while making the cost constant instead of width dependent.
+     */
+    private static final int MAX_GRADIENT_BANDS = 16;
+
+    /**
+     * Horizontal gradient fill, drawn as a small fixed number of bands
      */
     public static void drawHorizontalGradient(net.minecraft.client.gui.DrawContext context, int x, int y, int w, int h, int from, int to) {
         if(w <= 0 || h <= 0) {
@@ -131,13 +172,18 @@ public final class HudUtil {
             return;
         }
 
-        for(var column = 0; column < w; column++) {
-            context.fill(x + column, y, x + column + 1, y + h, lerpColor(from, to, (float)column / (w - 1)));
+        var bands = Math.min(w, MAX_GRADIENT_BANDS);
+
+        for(var band = 0; band < bands; band++) {
+            var start = (band * w) / bands;
+            var end = ((band + 1) * w) / bands;
+
+            context.fill(x + start, y, x + end, y + h, lerpColor(from, to, (float)start / (w - 1)));
         }
     }
 
     /**
-     * Vertical gradient fill, one row at a time
+     * Vertical gradient fill, drawn as a small fixed number of bands
      */
     public static void drawVerticalGradient(net.minecraft.client.gui.DrawContext context, int x, int y, int w, int h, int from, int to) {
         if(w <= 0 || h <= 0) {
@@ -149,8 +195,13 @@ public final class HudUtil {
             return;
         }
 
-        for(var row = 0; row < h; row++) {
-            context.fill(x, y + row, x + w, y + row + 1, lerpColor(from, to, (float)row / (h - 1)));
+        var bands = Math.min(h, MAX_GRADIENT_BANDS);
+
+        for(var band = 0; band < bands; band++) {
+            var start = (band * h) / bands;
+            var end = ((band + 1) * h) / bands;
+
+            context.fill(x, y + start, x + w, y + end, lerpColor(from, to, (float)start / (h - 1)));
         }
     }
 

@@ -1,5 +1,8 @@
 package org.loveroo.fireclient;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -26,7 +29,56 @@ public class RooHelper {
 
     private static final String colorCodeCharacter = "§";
 
+    /**
+     * Cache for {@link #gradientText(String, Color, Color)}.
+     *
+     * Gradient text used to be rebuilt from scratch on every frame for every HUD
+     * (FPS, coordinates, entity count, ...), which allocated one Text, one Style
+     * and one String per character, per frame. HUD values change slowly, so the
+     * same string is usually requested over and over.
+     *
+     * Bounded because coordinates change constantly and would otherwise grow it
+     * without limit. Eviction is plain insertion-order, which is fine here.
+     */
+    private static final int GRADIENT_CACHE_SIZE = 64;
+
+    private static final LinkedHashMap<GradientKey, MutableText> gradientCache =
+            new LinkedHashMap<>(GRADIENT_CACHE_SIZE * 2, 0.75f, false) {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<GradientKey, MutableText> eldest) {
+                    return size() > GRADIENT_CACHE_SIZE;
+                }
+            };
+
+    private record GradientKey(String msg, int color1, int color2) { }
+
     public static MutableText gradientText(String msg, Color color1, Color color2) {
+        var key = new GradientKey(msg, color1.toInt(), color2.toInt());
+
+        synchronized(gradientCache) {
+            var cached = gradientCache.get(key);
+            if(cached != null) {
+                // Callers append to the result (coordinates does), so hand back a copy
+                // and keep the cached original intact.
+                return cached.copy();
+            }
+        }
+
+        var built = buildGradientText(msg, color1, color2);
+
+        synchronized(gradientCache) {
+            var cached = gradientCache.get(key);
+            if(cached != null) {
+                return cached.copy();
+            }
+
+            gradientCache.put(key, built);
+        }
+
+        return built.copy();
+    }
+
+    private static MutableText buildGradientText(String msg, Color color1, Color color2) {
 //        if(FireClientside.getSetting(FireClientOption.DISABLE_GRADIENT) == 1) {
 //            return Text.literal(msg).withColor(color1.toInt());
 //        }

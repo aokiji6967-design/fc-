@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -20,6 +21,7 @@ import org.loveroo.fireclient.commands.FTextCommand;
 import org.loveroo.fireclient.data.Affiliates;
 import org.loveroo.fireclient.data.Color;
 import org.loveroo.fireclient.data.FireClientOption;
+import org.loveroo.fireclient.data.LivePing;
 import org.loveroo.fireclient.keybind.KeybindManager;
 import org.loveroo.fireclient.modules.AngleDisplayModule;
 import org.loveroo.fireclient.modules.ArmorHudModule;
@@ -43,6 +45,7 @@ import org.loveroo.fireclient.modules.LocalSkinModule;
 import org.loveroo.fireclient.modules.ModuleBase;
 import org.loveroo.fireclient.modules.NametagModule;
 import org.loveroo.fireclient.modules.ParticlesModule;
+import org.loveroo.fireclient.modules.PerformanceModule;
 import org.loveroo.fireclient.modules.PotionHudModule;
 import org.loveroo.fireclient.modules.SprintDisplayModule;
 import org.loveroo.fireclient.modules.PerspectiveModule;
@@ -85,6 +88,12 @@ public class FireClientside implements ClientModInitializer {
     private static final String FIRECLIENT_CONFIG_BACKUP_FILE = "config_bk.json";
 
     private static final HashMap<String, ModuleBase> modules = new HashMap<>();
+
+    // Cached snapshot of the values above. getModules() is called once per module
+    // per HUD frame and once per client tick, so rebuilding a list every call was
+    // a steady stream of garbage. Rebuilt by registerModule instead.
+    private static final ArrayList<ModuleBase> moduleList = new ArrayList<>();
+
     private static final HashMap<FireClientOption, Integer> settings = new HashMap<>();
 
     private static final Affiliates affiliates = new Affiliates();
@@ -102,6 +111,11 @@ public class FireClientside implements ClientModInitializer {
         
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             affiliates.fetchAffiliates();
+        });
+
+        // do not carry the previous server's measured ping into the next one
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+            LivePing.reset();
         });
 
         new GuiDrawer();
@@ -149,10 +163,13 @@ public class FireClientside implements ClientModInitializer {
         registerModule(new ReachDisplayModule());
         registerModule(new ZoomModule());
         registerModule(new CommandKeysModule());
+        registerModule(new PerformanceModule());
     }
 
     public static void registerModule(ModuleBase module) {
         modules.put(module.getData().getId(), module);
+
+        moduleList.add(module);
     }
 
     private void registerCommands() {
@@ -310,13 +327,13 @@ public class FireClientside implements ClientModInitializer {
             client.setScreen(new MainConfigScreen());
         }
 
-        for(var module : modules.values()) {
+        for(var module : moduleList) {
             module.update(client);
         }
     }
 
     public static List<ModuleBase> getModules() {
-        return modules.values().stream().toList();
+        return moduleList;
     }
 
     @Nullable

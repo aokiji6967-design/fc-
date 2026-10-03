@@ -98,17 +98,11 @@ public class ModuleData {
     }
 
     public int getPosX() {
-        var client = MinecraftClient.getInstance();
-        var width = client.getWindow().getScaledWidth();
-
-        return (int)Math.round(posX * width);
+        return (int)Math.round(posX * getScaledWidth());
     }
 
     public void setPosX(int x) {
-        var client = MinecraftClient.getInstance();
-        var width = client.getWindow().getScaledWidth();
-
-        setPosX(x, width);
+        setPosX(x, getScaledWidth());
     }
 
     public void setPosX(int x, int screenWidth) {
@@ -116,17 +110,43 @@ public class ModuleData {
     }
 
     public int getPosY() {
-        var client = MinecraftClient.getInstance();
-        var height = client.getWindow().getScaledHeight();
+        return (int)Math.round(posY * getScaledHeight());
+    }
 
-        return (int)Math.round(posY * height);
+    /**
+     * Scaled window dimensions.
+     *
+     * getPosX / getPosY are called several times per module per frame, and each call
+     * used to walk MinecraftClient -> Window -> scaled size. Cache the pair and only
+     * re-read when the window actually resizes (which also fires on GUI scale changes).
+     */
+    private static int scaledWidth = -1;
+    private static int scaledHeight = -1;
+
+    private static int getScaledWidth() {
+        refreshScaledSize();
+        return scaledWidth;
+    }
+
+    private static int getScaledHeight() {
+        refreshScaledSize();
+        return scaledHeight;
+    }
+
+    private static void refreshScaledSize() {
+        var window = MinecraftClient.getInstance().getWindow();
+
+        var width = window.getScaledWidth();
+        var height = window.getScaledHeight();
+
+        if(width != scaledWidth || height != scaledHeight) {
+            scaledWidth = width;
+            scaledHeight = height;
+        }
     }
 
     public void setPosY(int y) {
-        var client = MinecraftClient.getInstance();
-        var height = client.getWindow().getScaledHeight();
-
-        setPosY(y, height);
+        setPosY(y, getScaledHeight());
     }
 
     public void setPosY(int y, int screenHeight) {

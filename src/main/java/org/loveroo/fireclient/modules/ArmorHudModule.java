@@ -126,6 +126,13 @@ public class ArmorHudModule extends ModuleBase {
 
     private final ArrayList<ArmorHudSlotModule> slotModules = new ArrayList<>();
 
+    // Reused every frame by draw(). Layout is fixed at six slots, so the lists are
+    // sized once and only cleared, rather than reallocated on each render.
+    private static final int MAX_SLOTS = 6;
+
+    private final ArrayList<Entry> drawEntries = new ArrayList<>(MAX_SLOTS);
+    private final ArrayList<Size> drawSizes = new ArrayList<>(MAX_SLOTS);
+
     public ArmorHudModule() {
         super(new ModuleData("armor_hud", "\uD83D\uDEE1", color,
             "Armor HUD", "Shows your armor and held items with durability and stack counts. Use one bar, or move each slot on its own"));
@@ -373,7 +380,9 @@ public class ArmorHudModule extends ModuleBase {
 
         var editing = HudUtil.isEditing();
 
-        var entries = new ArrayList<Entry>();
+        var entries = drawEntries;
+        entries.clear();
+
         for(var slot : HudSlot.values()) {
             if(!isSlotEnabled(slot)) {
                 continue;
@@ -392,7 +401,9 @@ public class ArmorHudModule extends ModuleBase {
             return;
         }
 
-        var sizes = new ArrayList<Size>();
+        var sizes = drawSizes;
+        sizes.clear();
+
         var maxWidth = 0;
         var maxHeight = 0;
 

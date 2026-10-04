@@ -189,12 +189,15 @@ public class KeystrokesModule extends ModuleBase {
         super(new ModuleData("keystrokes", "\uD83D\uDD18", color,
             "Keystrokes", "Shows the keys you are pressing, with a smooth animation and clicks per second"));
 
-        getData().setVisible(false);
+        getData().setVisible(true);
         getData().setWidth(gridWidth());
         getData().setHeight(gridHeight());
 
+        // Positions are stored as a fraction of the screen, so these are
+        // (x / 640, y / 360) on a reference 640x360 window. Bottom left, sitting
+        // just above the hotbar.
         getData().setDefaultPosX(2, 640);
-        getData().setDefaultPosY(400, 360);
+        getData().setDefaultPosY(280, 360);
 
         var toggleBind = new Keybind("toggle_keystrokes",
                 Text.translatable("fireclient.keybind.generic.toggle.name"),
@@ -419,8 +422,6 @@ public class KeystrokesModule extends ModuleBase {
      * has some weight to it.
      */
     private void drawKey(DrawContext context, int id, float amount, int x, int y, int w, int h, boolean showBar, int cps) {
-        var centerX = x + (w / 2);
-        var centerY = y + (h / 2);
         var scale = 1.0f;
 
         if(pressScale && amount > 0.0f) {
@@ -429,29 +430,32 @@ public class KeystrokesModule extends ModuleBase {
         }
 
         var matrix = context.getMatrices();
+        var scaled = (scale != 1.0f);
 
-        if(scale != 1.0f) {
+        // The matrix does the shrinking for the whole key, box and text alike,
+        // so everything below draws at the unscaled rect. Shrinking the rect as
+        // well would apply the scale twice (a 20px key would render at ~17px
+        // and the label would shrink with it).
+        if(scaled) {
+            var centerX = x + (w / 2);
+            var centerY = y + (h / 2);
+
             matrix.pushMatrix();
             matrix.translate(centerX, centerY);
             matrix.scale(scale, scale);
             matrix.translate(-centerX, -centerY);
         }
 
-        var dx = Math.round(x + ((w * (1.0f - scale)) / 2.0f));
-        var dy = Math.round(y + ((h * (1.0f - scale)) / 2.0f));
-        var dw = Math.round(w * scale);
-        var dh = Math.round(h * scale);
-
         if(showBackground) {
-            HudUtil.drawBox(context, dx, dy, dw, dh, true, backgroundFor(amount),
+            HudUtil.drawBox(context, x, y, w, h, true, backgroundFor(amount),
                     showBorder, borderColorArgb);
         }
         else if(showBorder) {
-            HudUtil.drawBorder(context, dx, dy, dw, dh, borderColorArgb);
+            HudUtil.drawBorder(context, x, y, w, h, borderColorArgb);
         }
 
         if(showShadow) {
-            context.fill(dx + 1, dy + dh, dx + dw + 1, dy + dh + 1, 0x40000000);
+            context.fill(x + 1, y + h, x + w + 1, y + h + 1, 0x40000000);
         }
 
         var text = MinecraftClient.getInstance().textRenderer;
@@ -460,9 +464,9 @@ public class KeystrokesModule extends ModuleBase {
 
         if(showBar) {
             // the space bar is drawn as a strip rather than a centered label
-            var stripX = dx + 4;
-            var stripW = dw - 8;
-            var stripY = dy + (dh / 2) - 1;
+            var stripX = x + 4;
+            var stripW = w - 8;
+            var stripY = y + (h / 2) - 1;
 
             if(showTextShadow) {
                 context.fill(stripX + 1, stripY + 1, stripX + stripW + 1, stripY + 2, shadowOf(labelColor));
@@ -472,26 +476,26 @@ public class KeystrokesModule extends ModuleBase {
         }
         else if(cps >= 0) {
             // mouse keys stack the name above the click counter
-            var nameX = dx + ((dw - text.getWidth(label)) / 2);
-            var nameY = dy + 2;
+            var nameX = x + ((w - text.getWidth(label)) / 2);
+            var nameY = y + 2;
 
             context.drawText(text, label, nameX, nameY, labelColor, showTextShadow);
 
             var value = cpsString(cps);
             var valueW = Math.round(text.getWidth(value) * CPS_SCALE);
-            var cpsY = dy + dh - (Math.round(text.fontHeight * CPS_SCALE)) - 2;
+            var cpsY = y + h - (Math.round(text.fontHeight * CPS_SCALE)) - 2;
 
             HudUtil.drawScaledText(context, text, value,
-                dx + ((dw - valueW) / 2.0f), cpsY, CPS_SCALE, labelColor);
+                x + ((w - valueW) / 2.0f), cpsY, CPS_SCALE, labelColor);
         }
         else {
-            var centeredX = dx + ((dw - text.getWidth(label)) / 2);
-            var centeredY = dy + (dh / 2) - (text.fontHeight / 2);
+            var centeredX = x + ((w - text.getWidth(label)) / 2);
+            var centeredY = y + (h / 2) - (text.fontHeight / 2);
 
             context.drawText(text, label, centeredX, centeredY, labelColor, showTextShadow);
         }
 
-        if(scale != 1.0f) {
+        if(scaled) {
             matrix.popMatrix();
         }
     }

@@ -21,6 +21,9 @@ public class BlockOutlineModule extends ModuleBase {
 
     private static final Color color = Color.fromRGB(0x6E6E6E);
 
+    // Line width used for the thick outline, matches the value vanilla uses for its high contrast outline.
+    public static final float THICK_LINE_WIDTH = 7.0f;
+
     @JsonOption(name = "thick")
     private boolean thick = false;
 

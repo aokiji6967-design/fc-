@@ -34,7 +34,7 @@ public class ChangeBlockOutlineMixin {
     }
 
     @ModifyVariable(method = "drawBlockOutline", at = @At("HEAD"), ordinal = 0, argsOnly = true)
-    private VertexConsumer changeColor(VertexConsumer original) {
+    private VertexConsumer changeLayer(VertexConsumer original) {
         var outline = (BlockOutlineModule) FireClientside.getModule("block_outline");
         if(outline == null || !outline.getData().isEnabled()) {
             return original;
@@ -42,5 +42,17 @@ public class ChangeBlockOutlineMixin {
 
         var layer = (outline.isThick()) ? RenderLayers.secondaryBlockOutline() : RenderLayers.lines();
         return consumer.getBuffer(layer);
+    }
+
+    // The render layer alone does not change the outline thickness, the width is the last argument of
+    // drawBlockOutline and is what vanilla bumps to 7.0f for its own thick outline.
+    @ModifyVariable(method = "drawBlockOutline", at = @At("HEAD"), ordinal = 0, argsOnly = true)
+    private float changeLineWidth(float original) {
+        var outline = (BlockOutlineModule) FireClientside.getModule("block_outline");
+        if(outline == null || !outline.getData().isEnabled() || !outline.isThick()) {
+            return original;
+        }
+
+        return BlockOutlineModule.THICK_LINE_WIDTH;
     }
 }

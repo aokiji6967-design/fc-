@@ -15,13 +15,18 @@ import org.lwjgl.glfw.GLFW;
  * can show clicks per second.
  *
  * Only the press edge (GLFW_PRESS) is counted, so holding a button down stays
- * at a single click. Injected at TAIL and never cancels, so this never
- * interferes with the click handling in MouseMixin.
+ * at a single click.
+ *
+ * Injected at HEAD, never cancels. MouseMixin also injects at HEAD and is
+ * cancellable, so a TAIL inject here would be skipped whenever a keybind
+ * swallows a mouse button and the click count would silently under-report.
+ * Running at HEAD means the count is taken before anything can cancel it, and
+ * since this handler never cancels it cannot affect the click itself.
  */
 @Mixin(Mouse.class)
 public class KeystrokesClickMixin {
 
-    @Inject(method = "onMouseButton", at = @At("TAIL"))
+    @Inject(method = "onMouseButton", at = @At("HEAD"))
     private void trackClick(long window, MouseInput input, int action, CallbackInfo info) {
         if(action != GLFW.GLFW_PRESS) {
             return;

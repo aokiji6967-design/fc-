@@ -41,6 +41,7 @@ import org.loveroo.fireclient.modules.HighestBlockModule;
 import org.loveroo.fireclient.modules.HitColorModule;
 import org.loveroo.fireclient.modules.IndicatorsModule;
 import org.loveroo.fireclient.modules.KitModule;
+import org.loveroo.fireclient.modules.KeystrokesModule;
 import org.loveroo.fireclient.modules.LocalSkinModule;
 import org.loveroo.fireclient.modules.ModuleBase;
 import org.loveroo.fireclient.modules.NametagModule;
@@ -131,6 +132,7 @@ public class FireClientside implements ClientModInitializer {
     private void initModules() {
         registerModule(new ArmorHudModule());
         registerModule(new PotionHudModule());
+        registerModule(new KeystrokesModule());
         registerModule(new SprintDisplayModule());
         registerModule(new CoordinatesModule());
         registerModule(new ToggleToggleSneakModule());

@@ -42,6 +42,7 @@
     "modules.kit.GetSlotAccessor",
     "modules.kit.OverrideKitCommandMixin",
     "modules.kit.ReplaceSharedKitsMixin",
+    "modules.keystrokes.KeystrokesClickMixin",
     "modules.localskin.LocalSkinMixin",
     "modules.localskin.LocalSkinModelMixin",
     "modules.localskin.RemapTextureAccessor",

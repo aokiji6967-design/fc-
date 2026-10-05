@@ -157,7 +157,7 @@ public final class HudUtil {
      * look (a gradient across a small HUD element cannot show visible banding)
      * while making the cost constant instead of width dependent.
      */
-    private static final int MAX_GRADIENT_BANDS = 16;
+    private static final int MAX_GRADIENT_BANDS = 24;
 
     /**
      * Horizontal gradient fill, drawn as a small fixed number of bands
@@ -217,12 +217,16 @@ public final class HudUtil {
             boolean border, int borderColor,
             boolean shadow, int accentColor) {
         if(shadow) {
-            context.fill(x + 1, y + 2, x + w + 1, y + h + 2, 0x40000000);
+            // two stacked offsets so the shadow falls off softly instead of a hard 1px edge
+            context.fill(x + 1, y + 1, x + w + 2, y + h + 3, 0x30000000);
+            context.fill(x + 2, y + 2, x + w + 3, y + h + 4, 0x18000000);
         }
 
         if(background) {
-            drawVerticalGradient(context, x, y, w, h, lighten(backgroundColor, 0.12f), darken(backgroundColor, 0.10f));
-            context.fill(x, y, x + w, y + 1, 0x1AFFFFFF);
+            drawVerticalGradient(context, x, y, w, h, lighten(backgroundColor, 0.14f), darken(backgroundColor, 0.12f));
+            // top highlight and bottom shade give the panel a subtle 3d feel
+            context.fill(x, y, x + w, y + 1, 0x26FFFFFF);
+            context.fill(x, y + h - 1, x + w, y + h, 0x2E000000);
         }
 
         if(border) {
@@ -230,7 +234,9 @@ public final class HudUtil {
         }
 
         if(((accentColor >>> 24) & 0xFF) > 0) {
-            drawVerticalGradient(context, x, y, 2, h, lighten(accentColor, 0.25f), darken(accentColor, 0.15f));
+            // a faint glow bleeding out from the accent stripe
+            drawVerticalGradient(context, x + 2, y, 3, h, withOpacity(accentColor, 26), withOpacity(accentColor, 0));
+            drawVerticalGradient(context, x, y, 2, h, lighten(accentColor, 0.30f), darken(accentColor, 0.18f));
         }
     }
 
@@ -240,6 +246,7 @@ public final class HudUtil {
      */
     public static void drawBar(net.minecraft.client.gui.DrawContext context, int x, int y, int w, int h, float ratio, int color) {
         context.fill(x, y, x + w, y + h, 0xB0101014);
+        context.fill(x, y, x + w, y + 1, 0x38000000);
 
         var filled = Math.round(w * Math.clamp(ratio, 0.0f, 1.0f));
         if(filled <= 0) {
@@ -249,7 +256,7 @@ public final class HudUtil {
         drawHorizontalGradient(context, x, y, filled, h, darken(color, 0.10f), lighten(color, 0.35f));
 
         if(h > 1) {
-            context.fill(x, y, x + filled, y + 1, 0x33FFFFFF);
+            context.fill(x, y, x + filled, y + 1, 0x40FFFFFF);
         }
     }
 

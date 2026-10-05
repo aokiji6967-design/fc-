@@ -1,5 +1,5 @@
 {
-  "key.category.fireclient": "FireClient",
+  "key.category.fireclient": "Shadow Client",
   "key.fireclient.module_config": "Άνοιξε τη Διαμόρφωση Μονάδων",
 
   "fireclient.module.generic.visibility_toggle": "Ενεργοποιεί την εμφάνιση αυτής της μονάδας",
@@ -334,19 +334,19 @@
   "fireclient.module.zoom.scroll_zoom.name": "Μεγένθυση κατά Κύλιση",
   "fireclient.module.zoom.scroll_zoom.tooltip": "Αλλάζει το μέγεθος μεγένθυσης κατά την κύλιση του τροχού του ποντικιού",
 
-  "fireclient.screen.generic.header": "Διαμόρφωση FireClient",
+  "fireclient.screen.generic.header": "Διαμόρφωση Shadow Client",
 
-  "fireclient.screen.main_config.title": "Κύρια Καρτέλα Διαμόρφωσης FireClient",
+  "fireclient.screen.main_config.title": "Κύρια Καρτέλα Διαμόρφωσης Shadow Client",
   "fireclient.screen.main_config.tutorial": "Shift για προσκόλληση | Ctrl για μεταμόρφωση | Δεξί Κλικ για αλλαγή μεγέθους",
 
   "fireclient.screen.main_config.modules.name": "Μονάδες",
   "fireclient.screen.main_config.modules.tooltip": "Διαμορφώστε διάφορες μονάδες",
-  "fireclient.screen.main_config.settings.name": "Ρυθμίσεις FireClient",
-  "fireclient.screen.main_config.settings.tooltip": "Διαμόρφωση ρυθμίσεων FireClient",
+  "fireclient.screen.main_config.settings.name": "Ρυθμίσεις Shadow Client",
+  "fireclient.screen.main_config.settings.tooltip": "Διαμόρφωση ρυθμίσεων Shadow Client",
   "fireclient.screen.main_config.exit.name": "Έξοδος",
   "fireclient.screen.main_config.exit.tooltip": "Επιστροφή στο παιχνίδι",
 
-  "fireclient.screen.settings.title": "Επιλογές FireClient",
+  "fireclient.screen.settings.title": "Επιλογές Shadow Client",
   "fireclient.screen.settings.header": "Ρυθμίσεις",
   "fireclient.screen.settings.back.name": "Πίσω",
   "fireclient.screen.settings.back.tooltip": "Επιστροφή στην Κύρια Καρτέλα Διαμόρφωσης",
@@ -398,7 +398,7 @@
   "fireclient.settings.cache_uuid.description": "Αποθηκεύει προσωρινά το UUID της στοχευμένης οντότητας όταν ανοίγετε για πρώτη φορά την οθόνη συνομιλίας, επιτρέποντάς σας να το χρησιμοποιήσετε σε εντολές",
 
   "fireclient.settings.disable_gradient.name": "Απενεργοποίηση Διαβαθμίσεων",
-  "fireclient.settings.disable_gradient.description": "Απενεργοποιεί το κείμενο διαβάθμισης που χρησιμοποιείται στις περισσότερες μονάδες στο FireClient",
+  "fireclient.settings.disable_gradient.description": "Απενεργοποιεί το κείμενο διαβάθμισης που χρησιμοποιείται στις περισσότερες μονάδες στο Shadow Client",
 
   "fireclient.settings.chat_history.name": "Ιστορικό Συνομιλίας",
   "fireclient.settings.chat_history.description": "Τροποποιεί τη διάρκεια του ιστορικού συνομιλίας",

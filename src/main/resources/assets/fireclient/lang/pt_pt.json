@@ -1,5 +1,5 @@
 {
-  "key.category.fireclient": "FireClient",
+  "key.category.fireclient": "Shadow Client",
   "key.fireclient.module_config": "Abrir Configuração",
 
   "fireclient.module.generic.visibility_toggle": "Permite a renderização deste módulo",
@@ -334,19 +334,19 @@
   "fireclient.module.zoom.scroll_zoom.name": "Zoom de rolagem",
   "fireclient.module.zoom.scroll_zoom.tooltip": "Altera a quantidade de zoom ao rolar a roda do rato",
 
-  "fireclient.screen.generic.header": "Configuração FireClient",
+  "fireclient.screen.generic.header": "Configuração Shadow Client",
 
-  "fireclient.screen.main_config.title": "Configuração principal do FireClient",
+  "fireclient.screen.main_config.title": "Configuração principal do Shadow Client",
   "fireclient.screen.main_config.tutorial": "Shift para ajustar | Ctrl para transformar | Clique com o botão direito para dimensionar",
 
   "fireclient.screen.main_config.modules.name": "Módulos",
   "fireclient.screen.main_config.modules.tooltip": "Configura vários Módulos",
-  "fireclient.screen.main_config.settings.name": "Configurações do FireClient",
-  "fireclient.screen.main_config.settings.tooltip": "Configurar as definições do FireClient",
+  "fireclient.screen.main_config.settings.name": "Configurações do Shadow Client",
+  "fireclient.screen.main_config.settings.tooltip": "Configurar as definições do Shadow Client",
   "fireclient.screen.main_config.exit.name": "Sair",
   "fireclient.screen.main_config.exit.tooltip": "Voltar ao jogo",
 
-  "fireclient.screen.settings.title": "Opções do FireClient",
+  "fireclient.screen.settings.title": "Opções do Shadow Client",
   "fireclient.screen.settings.header": "Configurações",
   "fireclient.screen.settings.back.name": "Voltar",
   "fireclient.screen.settings.back.tooltip": "Voltar à tela de configuração principal",
@@ -398,7 +398,7 @@
   "fireclient.settings.cache_uuid.description": "Armazena em cache o UUID da entidade alvo quando abre o ecrã de chat pela primeira vez, permitindo utilizá-lo em comandos",
 
   "fireclient.settings.disable_gradient.name": "Desativar gradientes",
-  "fireclient.settings.disable_gradient.description": "Desativa o texto gradiente utilizado na maioria dos módulos no FireClient",
+  "fireclient.settings.disable_gradient.description": "Desativa o texto gradiente utilizado na maioria dos módulos no Shadow Client",
 
   "fireclient.settings.chat_history.name": "Hstórico do Chat",
   "fireclient.settings.chat_history.description": "Modifica o comprimento do histórico do chat",

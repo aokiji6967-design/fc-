@@ -1,5 +1,5 @@
 {
-  "key.category.fireclient": "FireClient",
+  "key.category.fireclient": "Shadow Client",
   "key.fireclient.module_config": "Open Module Config",
 
   "fireclient.module.generic.visibility_toggle": "Enables the rendering of this module",
@@ -334,19 +334,19 @@
   "fireclient.module.zoom.scroll_zoom.name": "Scroll Zoom",
   "fireclient.module.zoom.scroll_zoom.tooltip": "Changes the zoom amount when scrolling the mouse wheel",
 
-  "fireclient.screen.generic.header": "FireClient Config",
+  "fireclient.screen.generic.header": "Shadow Client Config",
 
-  "fireclient.screen.main_config.title": "FireClient Main Config",
+  "fireclient.screen.main_config.title": "Shadow Client Main Config",
   "fireclient.screen.main_config.tutorial": "Shift to snap | Ctrl for transform | Right Click to scale",
   
   "fireclient.screen.main_config.modules.name": "Modules",
   "fireclient.screen.main_config.modules.tooltip": "Configure various modules",
-  "fireclient.screen.main_config.settings.name": "FireClient Settings",
-  "fireclient.screen.main_config.settings.tooltip": "Configure FireClient settings",
+  "fireclient.screen.main_config.settings.name": "Shadow Client Settings",
+  "fireclient.screen.main_config.settings.tooltip": "Configure Shadow Client settings",
   "fireclient.screen.main_config.exit.name": "Exit",
   "fireclient.screen.main_config.exit.tooltip": "Return to game",
   
-  "fireclient.screen.settings.title": "FireClient Options",
+  "fireclient.screen.settings.title": "Shadow Client Options",
   "fireclient.screen.settings.header": "Settings",
   "fireclient.screen.settings.back.name": "Back",
   "fireclient.screen.settings.back.tooltip": "Return to the Main Config Screen",
@@ -398,7 +398,7 @@
   "fireclient.settings.cache_uuid.description": "Caches the targeted entity UUID when you first open the chat screen, allowing you to use it in commands",
 
   "fireclient.settings.disable_gradient.name": "Disable Gradients",
-  "fireclient.settings.disable_gradient.description": "Disables the gradient text used in most modules in FireClient",
+  "fireclient.settings.disable_gradient.description": "Disables the gradient text used in most modules in Shadow Client",
 
   "fireclient.settings.chat_history.name": "Length: %1$s",
   "fireclient.settings.chat_history.description": "Modifies the chat history length",

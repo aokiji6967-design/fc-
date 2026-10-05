@@ -3,7 +3,7 @@
 	"id": "fireclient",
 	"version": "${version}",
 
-	"name": "FireClient",
+	"name": "Shadow Client",
 	"description": "Not a client. Helps with SMPs [ made with love by roo ]\n\n* Greek translation: AlexOinks\n* Portuguese translation: VioletMeows",
 
 	"authors": [

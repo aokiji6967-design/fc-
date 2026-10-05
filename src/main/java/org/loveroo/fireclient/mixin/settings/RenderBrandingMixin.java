@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class RenderBrandingMixin {
 
     @Unique
-    private final MutableText brandingText = RooHelper.gradientText("FireClient", FireClientside.mainColor1, FireClientside.mainColor2);
+    private final MutableText brandingText = RooHelper.gradientText("Shadow Client", FireClientside.mainColor1, FireClientside.mainColor2);
 
     @Inject(method = "render(Lnet/minecraft/client/gui/DrawContext;IIF)V", at = @At("TAIL"), cancellable = true)
     public void render(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo info) {

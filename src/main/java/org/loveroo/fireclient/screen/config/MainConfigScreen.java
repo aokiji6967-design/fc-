@@ -89,6 +89,19 @@ public class MainConfigScreen extends ConfigScreenBase {
         super.close();
     }
 
+    /**
+     * init() hides every HUD module so the editor can draw them itself. close() only
+     * runs on Escape, so any other way of leaving this screen (inventory key, death,
+     * chat, a server switch, ...) went through setScreen -> removed() and left the
+     * modules flagged hidden forever. Every HUD then stayed invisible until the
+     * config screen was opened and closed again.
+     */
+    @Override
+    public void removed() {
+        removeOverwrite();
+        super.removed();
+    }
+
     private void removeOverwrite() {
         for(var module : FireClientside.getModules()) {
             module.setDrawingOverwritten(false);

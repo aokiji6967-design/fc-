@@ -79,8 +79,10 @@ import net.minecraft.util.Identifier;
 
 public class FireClientside implements ClientModInitializer {
 
-    public static final Color mainColor1 = new Color(213, 61, 49, 255);
-    public static final Color mainColor2 = new Color(225, 166, 55, 255);
+    // Shadow Client branding: saturated purple fading into a soft near-white lavender,
+    // the same red -> orange idea the old fire palette had
+    public static final Color mainColor1 = new Color(139, 61, 255, 255);
+    public static final Color mainColor2 = new Color(240, 235, 255, 255);
 
     private static final String FIRECLIENT_OLD_CONFIG_PATH = "fireclient.json";
     
@@ -112,6 +114,18 @@ public class FireClientside implements ClientModInitializer {
         
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             affiliates.fetchAffiliates();
+
+            // Safety net for hidden HUDs: a config screen that got replaced without
+            // close() (inventory key, death, a server switch, ...) used to leave every
+            // module flagged as "overwritten by the editor", so all HUDs stayed
+            // invisible after joining a server until the config was reopened.
+            // Same for vanilla's F1 state getting toggled while a loading screen was
+            // up. A fresh join now always starts with the HUD visible.
+            for(var module : getModules()) {
+                module.setDrawingOverwritten(false);
+            }
+
+            client.options.hudHidden = false;
         });
 
         // do not carry the previous server's measured ping into the next one
